@@ -1,46 +1,44 @@
 extends "res://Player/RecordablePlayer.gd"
 class_name Player
 
+const PlayerBullet = preload("res://Player/PlayerBullet.tscn")
+
 export(int) var ACCELERATION = 500
 export(int) var MAX_SPEED = 65
 export(float) var FRICTION = 0.25
+export(int) var BULLET_SPEED = 350
 export(int) var GRAVITY = 200
 export(int) var JUMP_FORCE = 120
 export(int) var MAX_SLOPE_ANGLE = 46
 
 enum PlayerState {
-	MOVE,
-	WALL_SLIDE,
-	FLOOR_SLIDE
+	MOVE
 }
 
 var MainInstances = Utils.get_MainInstances()
 
 var state = PlayerState.MOVE
 var time_scale = 1.0
-var spawn_point = Vector2.ZERO
-var motion = Vector2.ZERO
 var snap_vector = Vector2.ZERO
 var just_jumped = false
 
 onready var animationPlayer = $AnimationPlayer
 onready var coyoteJumpTimer = $CoyoteJumpTimer
+onready var muzzle = $Sprite/PlayerGun/Sprite/Muzzle
+onready var fireBulletTimer = $FireBulletTimer
 
 
 func _ready():
 	MainInstances.player = self  # So we can access the player everywhere
-	spawn_point = global_position
-
-
-func respawn():
-	global_position = spawn_point
 
 
 func _physics_process(delta):
 	parse_inputs() # Need to call this first. Implemented in RecordablePlayer
 
-	if Input.is_action_just_pressed("test_playback"):
+	if is_action_just_pressed("test_playback"):
 		get_tree().current_scene.reload_level()
+	if Input.is_action_just_pressed("test_kill_other_self"):
+		get_tree().current_scene.kill_other_self()
 
 	match state:
 		PlayerState.MOVE:
@@ -52,6 +50,17 @@ func _physics_process(delta):
 			apply_gravity(delta)
 			update_animations(input_vector)
 			move()
+
+	if Input.is_action_pressed("fire") and fireBulletTimer.time_left == 0:
+		fire_bullet()
+
+
+func fire_bullet():
+	var bullet = Utils.instance_scene_on_main(PlayerBullet, muzzle.global_position)
+	bullet.velocity = Vector2.RIGHT.rotated(gun.rotation) * BULLET_SPEED
+	bullet.velocity.x *= sprite.scale.x
+	bullet.rotation = bullet.velocity.angle()
+	fireBulletTimer.start()
 
 
 func get_input_vector():
@@ -97,12 +106,18 @@ func apply_gravity(delta):
 
 
 func update_animations(input_vector):
-	if input_vector.x != 0:
-		sprite.scale.x = input_vector.x
+	if not playback:
+		var facing = sign(get_local_mouse_position().x)
+		if facing != 0:
+			sprite.scale.x = facing
 
 	if input_vector.x != 0:
 		animationPlayer.play("Run")
+		# Play animation in reverse when player runs backwards
+		animationPlayer.playback_speed = input_vector.x * sprite.scale.x
 	else:
+		# Idle animation should never play in reverse
+		animationPlayer.playback_speed = 1
 		animationPlayer.play("Idle")
 
 	# Override run/idle if we're in the air

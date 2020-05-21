@@ -8,6 +8,7 @@ enum {
 signal button_pressed
 signal button_released
 
+var pressers = 0
 var state = NOT_PRESSED setget set_state
 
 onready var sprite = $Sprite
@@ -26,12 +27,24 @@ func set_state(value):
 
 
 func _on_Area2D_body_entered(body):
+	pressers += 1
+
+	if self.state == PRESSED:
+		print("Already pressed")
+		return  #Already pressed
+
 	print("Button Pressed!")
 	self.state = PRESSED
 	emit_signal("button_pressed")
 
 
 func _on_Area2D_body_exited(body):
-	print("Button Released!")
-	self.state = NOT_PRESSED
-	emit_signal("button_released")
+	pressers -= 1
+
+	if pressers <= 0:
+		print("Button Released!")
+		pressers = 0
+		self.state = NOT_PRESSED
+		emit_signal("button_released")
+	else:
+		print("Button still being held!")

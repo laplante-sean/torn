@@ -13,8 +13,8 @@ func instance_scene_on_main(packed_scene, position):
 	"""
 	var main = get_tree().current_scene
 	var instance = packed_scene.instance()
-	main.add_child(instance)
 	instance.global_position = position
+	main.add_child(instance)
 	return instance
 
 

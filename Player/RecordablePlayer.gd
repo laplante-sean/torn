@@ -11,7 +11,7 @@ enum {
 }
 
 var inputs = [
-	"ui_left", "ui_right", "jump", "crouch"
+	"ui_left", "ui_right", "jump", "fire", "test_playback"
 ]
 
 var current_inputs = {}  # Keeps track of what inputs are being pressed/released
@@ -20,16 +20,54 @@ var recorded_data = []  # The recorded data for a session
 var recording = true  # Whether or not we're recording
 var playback = false  # Whether or not we're playing back
 var record_idx = 0  # The current record index we're working on during playback
+var playback_loop = false  # Whether or not to loop playback
+var spawn_point = Vector2.ZERO  # The orignal spawn point
+var motion = Vector2.ZERO  # The player's motion
 
 onready var sprite = $Sprite
+onready var gun = $Sprite/PlayerGun
 
 
 func _ready():
+	spawn_point = global_position
+	
 	# Build our dict
 	for input in inputs:
 		current_inputs[input] = {
 			"action": NOT_PRESSED
 		}
+
+
+func respawn(start_recording=false):
+	"""
+	Respawn the player. Optionally start recording on respawn.
+	
+	:param start_recording: Whether or not to start recording on respawn
+	"""
+	print("Respawn: ", spawn_point)
+	global_position = spawn_point
+	motion = Vector2.ZERO
+	if start_recording:
+		start_recording()
+
+
+func has_recorded_data():
+	"""
+	:returns: True if there is data recorded, false otherwise.
+	"""
+	return len(recorded_data) > 0
+
+
+func take_recorded_data():
+	"""
+	This will return the recorded data and clear it
+	for this instance.
+	
+	:returns: The recorded data
+	"""
+	var ret = recorded_data
+	clear_recording()
+	return ret
 
 
 func start_recording():
@@ -41,15 +79,18 @@ func start_recording():
 	recording = true
 
 
-func start_playback():
+func start_playback(loop=false):
 	"""
 	Start playing back actions if there are any. Will stop
 	recording if one is in progress.
+	
+	:param loop: If true, this playback will loop otherwise it will stop at the end
 	"""
 	stop_recording()
 	playback = true
 	frame_count = 0
 	record_idx = 0
+	playback_loop = loop
 
 
 func stop_recording():
@@ -64,6 +105,7 @@ func stop_playback():
 	Stop playing back
 	"""
 	playback = false
+	playback_loop = false
 
 
 func clear_recording():
@@ -131,6 +173,9 @@ func playback_set_input(input, action):
 	"""
 	Helper to set the input during playback
 	"""
+	if input == "test_playback":
+		return  # Don't playback this one
+	
 	# During playback, action will only be JUST_PRESSED or JUST_RELEASED
 	if action == JUST_PRESSED:
 		playback_action_press(input)
@@ -165,7 +210,8 @@ func record():
 		"frame": frame_count,        # Current physics frame for playback
 		"inputs": [],                # The current inputs
 		"position": global_position, # Global position for sanity checking
-		"facing": sprite.scale.x     # The direction we're facing
+		"facing": sprite.scale.x,    # The direction we're facing
+		"gun_rotation": gun.rotation  # The player's gun rotation
 	}
 
 	# Gather up all the inputs that are in some state other than NOT_PRESSED
@@ -185,18 +231,27 @@ func record():
 
 
 func playback():
-	if record_idx >= len(recorded_data):
+	if record_idx == len(recorded_data):
+		var start_again = false
+		if playback_loop:
+			start_again = true
+		
 		stop_playback()
 		clear_inputs()  # Don't want to leave anything pressed
 		emit_signal("playback_complete")
+		
+		if start_again:
+			start_playback(true)
+			respawn()
 		return  # Done
 
 	if frame_count != recorded_data[record_idx].frame:
 		return  # We're not at the physics frame for the next record yet
 
 	var data = recorded_data[record_idx]
-	#global_position = data.position
+	global_position = data.position
 	sprite.scale.x = data.facing
+	gun.rotation = data.gun_rotation
 	
 	for input_record in data.inputs:
 		playback_set_input(input_record.input, input_record.action)
