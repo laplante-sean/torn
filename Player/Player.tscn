@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Player/player.png" type="Texture" id=1]
 [ext_resource path="res://Player/Player.gd" type="Script" id=2]
 [ext_resource path="res://Player/PlayerGun.tscn" type="PackedScene" id=3]
+[ext_resource path="res://CollisionBoxes/Hurtbox.tscn" type="PackedScene" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 4, 10 )
@@ -56,6 +57,9 @@ tracks/0/keys = {
 "values": [ 7, 8, 7, 6, 5, 4, 5, 6 ]
 }
 
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 4, 10 )
+
 [node name="Player" type="KinematicBody2D"]
 collision_layer = 2
 script = ExtResource( 2 )
@@ -90,4 +94,12 @@ one_shot = true
 process_mode = 0
 wait_time = 0.25
 one_shot = true
-[connection signal="playback_complete" from="." to="." method="_on_Player_playback_complete"]
+
+[node name="Hurtbox" parent="." instance=ExtResource( 4 )]
+
+[node name="Collider" parent="Hurtbox" index="0"]
+position = Vector2( 0, -2 )
+shape = SubResource( 5 )
+[connection signal="hit" from="Hurtbox" to="." method="_on_Hurtbox_hit"]
+
+[editable path="Hurtbox"]

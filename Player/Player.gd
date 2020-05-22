@@ -1,6 +1,10 @@
 extends "res://Player/RecordablePlayer.gd"
 class_name Player
 
+signal died
+signal begin_loop
+signal hit_door
+
 const PlayerBullet = preload("res://Player/PlayerBullet.tscn")
 
 export(int) var ACCELERATION = 500
@@ -35,10 +39,8 @@ func _ready():
 func _physics_process(delta):
 	parse_inputs() # Need to call this first. Implemented in RecordablePlayer
 
-	if is_action_just_pressed("test_playback"):
-		get_tree().current_scene.reload_level()
-	if Input.is_action_just_pressed("test_kill_other_self"):
-		get_tree().current_scene.kill_other_self()
+	if is_action_just_pressed("start_loop"):
+		emit_signal("begin_loop")
 
 	match state:
 		PlayerState.MOVE:
@@ -51,7 +53,7 @@ func _physics_process(delta):
 			update_animations(input_vector)
 			move()
 
-	if Input.is_action_pressed("fire") and fireBulletTimer.time_left == 0:
+	if is_action_pressed("fire") and fireBulletTimer.time_left == 0:
 		fire_bullet()
 
 
@@ -106,7 +108,7 @@ func apply_gravity(delta):
 
 
 func update_animations(input_vector):
-	if not playback:
+	if not is_playback:
 		var facing = sign(get_local_mouse_position().x)
 		if facing != 0:
 			sprite.scale.x = facing
@@ -156,5 +158,6 @@ func move():
 		position.x = last_position.x
 
 
-func _on_Player_playback_complete():
-	print("Playback complete!")
+func _on_Hurtbox_hit(damage):
+	emit_signal("died")
+	queue_free()

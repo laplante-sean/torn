@@ -11,14 +11,14 @@ enum {
 }
 
 var inputs = [
-	"ui_left", "ui_right", "jump", "fire", "test_playback"
+	"ui_left", "ui_right", "jump", "fire", "start_loop"
 ]
 
 var current_inputs = {}  # Keeps track of what inputs are being pressed/released
 var frame_count = 0  # Keeps count of the physics frames while we're recording/playing-back
 var recorded_data = []  # The recorded data for a session
 var recording = true  # Whether or not we're recording
-var playback = false  # Whether or not we're playing back
+var is_playback = false  # Whether or not we're playing back
 var record_idx = 0  # The current record index we're working on during playback
 var playback_loop = false  # Whether or not to loop playback
 var spawn_point = Vector2.ZERO  # The orignal spawn point
@@ -44,7 +44,6 @@ func respawn(start_recording=false):
 	
 	:param start_recording: Whether or not to start recording on respawn
 	"""
-	print("Respawn: ", spawn_point)
 	global_position = spawn_point
 	motion = Vector2.ZERO
 	if start_recording:
@@ -87,7 +86,7 @@ func start_playback(loop=false):
 	:param loop: If true, this playback will loop otherwise it will stop at the end
 	"""
 	stop_recording()
-	playback = true
+	is_playback = true
 	frame_count = 0
 	record_idx = 0
 	playback_loop = loop
@@ -104,7 +103,7 @@ func stop_playback():
 	"""
 	Stop playing back
 	"""
-	playback = false
+	is_playback = false
 	playback_loop = false
 
 
@@ -125,7 +124,7 @@ func parse_inputs():
 	_physics_process to parse the input. Ignores user
 	input if playback is true.
 	"""
-	if not playback:
+	if not is_playback:
 		# If we're not playing back, parse the real input
 		for input in inputs:
 			if Input.is_action_just_pressed(input):
@@ -151,7 +150,7 @@ func parse_inputs():
 	if recording:
 		record()  # Record the input if we're recording
 
-	if playback:
+	if is_playback:
 		playback()  # Playback actions
 
 	frame_count += 1  # Always increment the frame count
@@ -173,7 +172,7 @@ func playback_set_input(input, action):
 	"""
 	Helper to set the input during playback
 	"""
-	if input == "test_playback":
+	if input == "start_loop":
 		return  # Don't playback this one
 	
 	# During playback, action will only be JUST_PRESSED or JUST_RELEASED
