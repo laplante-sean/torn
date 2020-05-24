@@ -51,24 +51,18 @@ func reload_level():
 	if other_self:
 		other_self.queue_free()
 		other_self = null
+		currentLevel.activate_portal()
 	player.respawn(true)
 
 
-func change_levels(portal):
-	print("Change levels: ", portal)
-	var offset = portal.get_next_level_spawn_loc()
-	var NextLevel = load(portal.next_level_path)
+func change_levels(level_portal):
+	print("Change levels: ", level_portal)
+	var NextLevel = load(level_portal.next_level_path)
+	currentLevel.queue_free()
 	var nextLevel = NextLevel.instance()
 	add_child(nextLevel)
-	
-	#
-	# TODO: Make sure this is good!
-	#
-	var next_offset = nextLevel.position - nextLevel.spawnPoint.position
-	nextLevel.position = next_offset + offset
-	# TODO: Unload the prev. level
-	# TODO: Restart recording
-	# TODO: Disable loop in elevator
+	player.spawn_point = nextLevel.get_spawn_point()
+	player.respawn(true)
 
 
 func _on_Player_died():
@@ -78,15 +72,19 @@ func _on_Player_died():
 func _on_other_self_died():
 	print("Loop broken!")
 	other_self = null
+	currentLevel.activate_portal()
 
 
 func _on_Player_begin_loop():
 	if player.has_recorded_data() and other_self == null:
+		currentLevel.deactivate_portal()
 		other_self = Utils.instance_scene_on_main(Player, player.spawn_point)
+		other_self.set_is_clone()
 		other_self.connect("died", self, "_on_other_self_died")
 		other_self.recorded_data = player.take_recorded_data()
 		other_self.start_playback(true)
+		player.respawn(true)
 
 
-func _on_Player_hit_door(door):
-	call_deferred("change_levels", door)
+func _on_Player_level_complete(level_portal):
+	call_deferred("change_levels", level_portal)

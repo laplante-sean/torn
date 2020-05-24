@@ -3,7 +3,7 @@ class_name Player
 
 signal died
 signal begin_loop
-signal hit_door
+signal level_complete(level_portal)
 
 const PlayerBullet = preload("res://Player/PlayerBullet.tscn")
 
@@ -30,6 +30,7 @@ onready var animationPlayer = $AnimationPlayer
 onready var coyoteJumpTimer = $CoyoteJumpTimer
 onready var muzzle = $Sprite/PlayerGun/Sprite/Muzzle
 onready var fireBulletTimer = $FireBulletTimer
+onready var hurtbox = $Hurtbox
 
 
 func _ready():
@@ -156,6 +157,16 @@ func move():
 	if is_on_floor() and get_floor_velocity().length() == 0 and abs(motion.x) < 1:
 		# If we're on the floor, not on a moving platform, and our motion is super tiny...don't move
 		position.x = last_position.x
+
+
+func set_is_clone():
+	# Turn off player layer and turn on ClonePlayer layer
+	set_collision_layer_bit(1, false)
+	set_collision_layer_bit(3, true)
+	
+	# Turn off player hurtbox and turn on clone player hurtbox layer
+	hurtbox.set_collision_layer_bit(2, false)
+	hurtbox.set_collision_layer_bit(4, true)
 
 
 func _on_Hurtbox_hit(damage):

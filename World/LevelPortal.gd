@@ -1,17 +1,26 @@
-extends Area2D
+extends StaticBody2D
 
 export(String, FILE, "*.tscn") var next_level_path = ""
 
-var active = true
+var player = null
+var active = true setget set_active
 
-onready var newLevelSpawn = $NewLevelSpawn
+onready var sprite = $Sprite
+onready var playerDetector = $PlayerDetector
+onready var playerDetectCollisionShape = $PlayerDetector/CollisionShape2D
 
 
-func get_next_level_spawn_loc():
-	return newLevelSpawn.global_position
+func set_active(value):
+	active = value
+	if value:
+		sprite.frame = 1
+		if player != null:
+			player.emit_signal("level_complete", self)
+	else:
+		sprite.frame = 0
 
 
-func _on_LevelPortal_body_entered(player):
-	if active:
-		player.emit_signal("hit_door", self)
-		active = false
+func _on_PlayerDetector_body_entered(player):
+	self.player = player
+	if self.active:
+		player.emit_signal("level_complete", self)

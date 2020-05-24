@@ -21,6 +21,7 @@ var recording = true  # Whether or not we're recording
 var is_playback = false  # Whether or not we're playing back
 var record_idx = 0  # The current record index we're working on during playback
 var playback_loop = false  # Whether or not to loop playback
+var out_of_sync = false  # Set to true if a playback gets FUBAR
 var spawn_point = Vector2.ZERO  # The orignal spawn point
 var motion = Vector2.ZERO  # The player's motion
 
@@ -105,6 +106,7 @@ func stop_playback():
 	"""
 	is_playback = false
 	playback_loop = false
+	out_of_sync = false
 
 
 func clear_recording():
@@ -248,7 +250,22 @@ func playback():
 		return  # We're not at the physics frame for the next record yet
 
 	var data = recorded_data[record_idx]
-	global_position = data.position
+	
+	# Error correction
+	if global_position != data.position and !out_of_sync:
+		# Something is out of sync. See if we can fix it.
+		var direction = global_position.direction_to(data.position)  # Get normalized vector pointing at destination
+		var distance = global_position.distance_to(data.position)  # Get how far we would be jumped
+		if not test_move(transform, direction * distance):
+			# No collision would occur so let's fix the position
+			global_position = data.position
+		else:
+			# At this point we kindof just have to throw the data.position out
+			out_of_sync = true
+	elif global_position == data.position and out_of_sync:
+		# We've come back into sync (maybe they were running into a wall or whatever)
+		out_of_sync = false
+
 	sprite.scale.x = data.facing
 	gun.rotation = data.gun_rotation
 	

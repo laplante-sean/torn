@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/level-portal.png-b86e9dbf6618520b307bb9ce352a3295.stex"
+path="res://.import/level-portal-sheet.png-2dd11fee3826d8fcd723b40b004761aa.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://World/level-portal.png"
-dest_files=[ "res://.import/level-portal.png-b86e9dbf6618520b307bb9ce352a3295.stex" ]
+source_file="res://World/level-portal-sheet.png"
+dest_files=[ "res://.import/level-portal-sheet.png-2dd11fee3826d8fcd723b40b004761aa.stex" ]
 
 [params]
 
