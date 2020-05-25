@@ -1,11 +1,15 @@
 extends Node2D
 
-onready var sprite = $Sprite
+onready var animationPlayer = $AnimationPlayer
+
+export(bool) var follow_mouse = true
 
 
-func _process(_delta):
-	var playerSprite = get_parent()
-	var player = playerSprite.get_parent()
-	if player.is_playback:
-		return  # If this is a playback player don't use mouse.
-	rotation = playerSprite.get_local_mouse_position().angle()
+func _physics_process(_delta):
+	if follow_mouse:
+		var sprite = get_parent()
+		rotation = sprite.get_local_mouse_position().angle()
+
+
+func play_death_animation():
+	animationPlayer.play("Die")

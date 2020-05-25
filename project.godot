@@ -10,22 +10,34 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Resource",
+"class": "InputHelper",
+"language": "GDScript",
+"path": "res://InputHelper/InputHelper.gd"
+}, {
+"base": "Resource",
 "class": "MainInstances",
 "language": "GDScript",
 "path": "res://MainInstances/MainInstances.gd"
+}, {
+"base": "Player",
+"class": "PlaybackPlayer",
+"language": "GDScript",
+"path": "res://Player/PlaybackPlayer.gd"
 }, {
 "base": "KinematicBody2D",
 "class": "Player",
 "language": "GDScript",
 "path": "res://Player/Player.gd"
 }, {
-"base": "KinematicBody2D",
+"base": "Player",
 "class": "RecordablePlayer",
 "language": "GDScript",
 "path": "res://Player/RecordablePlayer.gd"
 } ]
 _global_script_class_icons={
+"InputHelper": "",
 "MainInstances": "",
+"PlaybackPlayer": "",
 "Player": "",
 "RecordablePlayer": ""
 }
@@ -125,6 +137,11 @@ reset_camera={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":81,"unicode":0,"echo":false,"script":null)
  ]
 }
+start_recording={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":69,"unicode":0,"echo":false,"script":null)
+ ]
+}
 
 [layer_names]
 
@@ -133,7 +150,6 @@ reset_camera={
 2d_physics/layer_3="PlayerHurtbox"
 2d_physics/layer_4="ClonePlayer"
 2d_physics/layer_5="ClonePlayerHurtbox"
-2d_physics/layer_6="DynamicWorldItem"
 
 [rendering]
 

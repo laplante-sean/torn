@@ -1,54 +1,46 @@
-extends KinematicBody2D
+extends Player
 class_name RecordablePlayer
 
-signal playback_complete
+signal begin_loop
+signal exit_level(level_portal)
 
-enum {
-	NOT_PRESSED,
-	PRESSED,
-	JUST_PRESSED,
-	JUST_RELEASED
-}
-
-var inputs = [
-	"ui_left", "ui_right", "jump", "fire", "start_loop"
-]
-
-var current_inputs = {}  # Keeps track of what inputs are being pressed/released
+var MainInstances = Utils.get_MainInstances()
 var frame_count = 0  # Keeps count of the physics frames while we're recording/playing-back
 var recorded_data = []  # The recorded data for a session
-var recording = true  # Whether or not we're recording
-var is_playback = false  # Whether or not we're playing back
-var record_idx = 0  # The current record index we're working on during playback
-var playback_loop = false  # Whether or not to loop playback
-var out_of_sync = false  # Set to true if a playback gets FUBAR
-var spawn_point = Vector2.ZERO  # The orignal spawn point
-var motion = Vector2.ZERO  # The player's motion
-
-onready var sprite = $Sprite
-onready var gun = $Sprite/PlayerGun
+var is_recording = true  # Whether or not we're recording  TODO - Default to false
+var record_point = Vector2.ZERO  # Point we hit the record button
 
 
 func _ready():
+	MainInstances.player = self
 	spawn_point = global_position
-	
-	# Build our dict
-	for input in inputs:
-		current_inputs[input] = {
-			"action": NOT_PRESSED
-		}
 
 
-func respawn(start_recording=false):
-	"""
-	Respawn the player. Optionally start recording on respawn.
+func _physics_process(delta):
+	process_input(delta)  # Actually move the player, update animations, etc.
 	
-	:param start_recording: Whether or not to start recording on respawn
+	if is_action_just_pressed("start_recording"):
+		if is_on_floor():
+			print("Begin recording")
+			start_recording()
+		else:
+			print("Can only begin recordings on floor")
+	
+	if is_recording:
+		record()
+
+	if is_action_just_pressed("start_loop"):
+		emit_signal("begin_loop")
+
+	frame_count += 1
+
+
+func respawn():
 	"""
-	global_position = spawn_point
-	motion = Vector2.ZERO
-	if start_recording:
-		start_recording()
+	Respawn the player. (overrides base Player class respawn())
+	"""
+	clear_recording()
+	.respawn()  # Call base Player class respawn()
 
 
 func has_recorded_data():
@@ -70,43 +62,28 @@ func take_recorded_data():
 	return ret
 
 
+func get_record_start_point():
+	"""
+	Helper that gets the global position set when the recording started
+	"""
+	return record_point
+
+
 func start_recording():
 	"""
 	Start recording actions. Will clear any previous recording
 	and will stop any playback.
 	"""
 	clear_recording()
-	recording = true
-
-
-func start_playback(loop=false):
-	"""
-	Start playing back actions if there are any. Will stop
-	recording if one is in progress.
-	
-	:param loop: If true, this playback will loop otherwise it will stop at the end
-	"""
-	stop_recording()
-	is_playback = true
-	frame_count = 0
-	record_idx = 0
-	playback_loop = loop
+	record_point = global_position
+	is_recording = true
 
 
 func stop_recording():
 	"""
 	Stop recording actions
 	"""
-	recording = false
-
-
-func stop_playback():
-	"""
-	Stop playing back
-	"""
-	is_playback = false
-	playback_loop = false
-	out_of_sync = false
+	is_recording = false
 
 
 func clear_recording():
@@ -114,184 +91,43 @@ func clear_recording():
 	Stops and clears the recorded data
 	"""
 	stop_recording()  # Make sure we're stopped
-	stop_playback()  # Can't clear if we're playing back
 	frame_count = 0
 	recorded_data = []
-	record_idx = 0
-
-
-func parse_inputs():
-	"""
-	Called on each frame from an inherited player's
-	_physics_process to parse the input. Ignores user
-	input if playback is true.
-	"""
-	if not is_playback:
-		# If we're not playing back, parse the real input
-		for input in inputs:
-			if Input.is_action_just_pressed(input):
-				set_input(input, JUST_PRESSED)
-			elif Input.is_action_pressed(input):
-				set_input(input, PRESSED)
-			elif Input.is_action_just_released(input):
-				set_input(input, JUST_RELEASED)
-			else:
-				set_input(input, NOT_PRESSED)
-	else:
-		# If we're playing back we need to make sure to switch
-		# JUST_PRESSED to PRESSED and JUST_RELEASED to NOT_PRESSED
-		# since actions will be getting set directly by calls to
-		# action_press() and action_release()
-		for input in inputs:
-			var prev_action = get_input_action(input)
-			if prev_action == JUST_PRESSED:
-				set_input(input, PRESSED)
-			elif prev_action == JUST_RELEASED:
-				set_input(input, NOT_PRESSED)
-
-	if recording:
-		record()  # Record the input if we're recording
-
-	if is_playback:
-		playback()  # Playback actions
-
-	frame_count += 1  # Always increment the frame count
-
-
-func set_input(input, action):
-	"""
-	Used to set the current inputs.
-	"""
-	current_inputs[input].action = action
-
-
-func clear_inputs():
-	for input in inputs:
-		current_inputs[input].action = NOT_PRESSED
-
-
-func playback_set_input(input, action):
-	"""
-	Helper to set the input during playback
-	"""
-	if input == "start_loop":
-		return  # Don't playback this one
-	
-	# During playback, action will only be JUST_PRESSED or JUST_RELEASED
-	if action == JUST_PRESSED:
-		playback_action_press(input)
-	else:
-		playback_action_release(input)
-
-
-func playback_action_press(input):
-	"""
-	Called during playback to set an action
-	"""
-	var action = get_input_action(input)
-	if action == NOT_PRESSED or action == JUST_RELEASED:
-		set_input(input, JUST_PRESSED)
-
-
-func playback_action_release(input):
-	"""
-	Called during playback to release an action
-	"""
-	var action = get_input_action(input)
-	if action == JUST_PRESSED or action == PRESSED:
-		set_input(input, JUST_RELEASED)
-
-
-func get_input_action(input):
-	return current_inputs[input].action
+	record_point = Vector2.ZERO
 
 
 func record():
+	"""
+	Used to record inputs while recording is running
+	"""
 	var current_record = {
-		"frame": frame_count,        # Current physics frame for playback
-		"inputs": [],                # The current inputs
-		"position": global_position, # Global position for sanity checking
-		"facing": sprite.scale.x,    # The direction we're facing
-		"gun_rotation": gun.rotation  # The player's gun rotation
+		"frame": frame_count,              # Current physics frame for playback
+		"inputs": [],                      # The current inputs
+		"position": global_position,       # Global position for sanity checking
+		"facing": sprite.scale.x,          # The direction we're facing
+		"gun_rotation": gun.rotation       # The player's gun rotation
 	}
 
-	# Gather up all the inputs that are in some state other than NOT_PRESSED
-	for input in inputs:
-		var action = get_input_action(input)
-		if action == JUST_PRESSED or action == JUST_RELEASED:
-			# We don't need to track PRESSED that will happen
-			# during playback.
-			current_record.inputs.push_back({
-				"input": input,
-				"action": action
-			})
+	# We only parse out JUST_PRESSED and JUST_RELEASED actions (all we need)
+	for input in InputHelper.PossibleInputs:
+		var obj = {
+			"input": input,
+			"action": InputHelper.InputState.NOT_PRESSED
+		}
+		
+		if is_action_just_pressed(input):
+			obj.action = InputHelper.InputState.JUST_PRESSED
+		elif is_action_just_released(input):
+			obj.action = InputHelper.InputState.JUST_RELEASED
+		elif len(recorded_data) == 0 and is_action_pressed(input):
+			# If we just started recording while actions were held,
+			# set them as JUST_PRESSED
+			obj.action = InputHelper.InputState.JUST_PRESSED
+		else:
+			continue  # Skip all NOT_PRESSED/PRESSED actions
+
+		current_record.inputs.push_back(obj)
 
 	# Save to our global recorded_data struct if there were any inputs
 	if len(current_record.inputs) > 0:
 		recorded_data.push_back(current_record)
-
-
-func playback():
-	if record_idx == len(recorded_data):
-		var start_again = false
-		if playback_loop:
-			start_again = true
-		
-		stop_playback()
-		clear_inputs()  # Don't want to leave anything pressed
-		emit_signal("playback_complete")
-		
-		if start_again:
-			start_playback(true)
-			respawn()
-		return  # Done
-
-	if frame_count != recorded_data[record_idx].frame:
-		return  # We're not at the physics frame for the next record yet
-
-	var data = recorded_data[record_idx]
-	
-	# Error correction
-	if global_position != data.position and !out_of_sync:
-		# Something is out of sync. See if we can fix it.
-		var direction = global_position.direction_to(data.position)  # Get normalized vector pointing at destination
-		var distance = global_position.distance_to(data.position)  # Get how far we would be jumped
-		if not test_move(transform, direction * distance):
-			# No collision would occur so let's fix the position
-			global_position = data.position
-		else:
-			# At this point we kindof just have to throw the data.position out
-			out_of_sync = true
-	elif global_position == data.position and out_of_sync:
-		# We've come back into sync (maybe they were running into a wall or whatever)
-		out_of_sync = false
-
-	sprite.scale.x = data.facing
-	gun.rotation = data.gun_rotation
-	
-	for input_record in data.inputs:
-		playback_set_input(input_record.input, input_record.action)
-	
-	record_idx += 1
-
-
-func get_action_strength(input):
-	var action = get_input_action(input)
-	if action == PRESSED or action == JUST_PRESSED:
-		return 1
-	return 0
-
-
-func is_action_just_pressed(input):
-	return get_input_action(input) == JUST_PRESSED
-
-
-func is_action_just_released(input):
-	return get_input_action(input) == JUST_RELEASED
-
-
-func is_action_pressed(input):
-	var action = get_input_action(input)
-	if action == PRESSED or action == JUST_PRESSED:
-		return true
-	return false

@@ -3,7 +3,7 @@ extends Node2D
 var velocity = Vector2.ZERO
 
 
-func _process(delta):
+func _physics_process(delta):
 	position += velocity * delta
 
 

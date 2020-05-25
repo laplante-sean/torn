@@ -1,14 +1,13 @@
 extends Node
 
-const Player = preload("res://Player/Player.tscn")
+const PlaybackPlayer = preload("res://Player/PlaybackPlayer.tscn")
 
 export(float) var CAMERA_ZOOM_STEP = 0.05
 export(float) var MIN_ZOOM = 1
 export(float) var MAX_ZOOM = 2
 
 onready var currentLevel = $Level_00
-onready var player = $Player
-onready var probPlayer = $ProbabilityPlayer
+onready var player = $RecordablePlayer
 onready var camera = $Camera
 
 var other_self = null  # If a loop is playing this holds the other self
@@ -17,26 +16,19 @@ var other_self = null  # If a loop is playing this holds the other self
 func _ready():
 	# So the background defaults to black on every frame
 	VisualServer.set_default_clear_color(Color.black)
-	player.connect("hit_door", self, "_on_Player_hit_door")
-	set_player_spawn(currentLevel.get_spawn_point())
-	probPlayer.set_is_probable_future()
+	player.spawn(currentLevel.get_spawn_point())
 
 
-func set_player_spawn(set_pos):
-	player.global_position = set_pos
-	player.spawn_point = player.global_position
-	probPlayer.global_position = player.global_position
-	probPlayer.spawn_point = player.global_position
-
-
-func _process(delta):
+func _physics_process(_delta):
 	if Input.is_action_just_pressed("redo_level"):
+		print("Resetting level")
 		reload_level()
 	if Input.is_action_just_released("zoom_in"):
 		zoom_in()
 	if Input.is_action_just_released("zoom_out"):
 		zoom_out()
 	if Input.is_action_just_pressed("reset_camera"):
+		print("Reset camera")
 		reset_zoom()
 
 
@@ -62,8 +54,9 @@ func reload_level():
 		other_self.queue_free()
 		other_self = null
 		currentLevel.activate_portal()
-	player.respawn(true)
-	probPlayer.respawn()
+	
+	# Respawn the player (recording will be cleared)
+	player.respawn()
 
 
 func change_levels(level_portal):
@@ -72,13 +65,7 @@ func change_levels(level_portal):
 	currentLevel.queue_free()
 	var nextLevel = NextLevel.instance()
 	add_child(nextLevel)
-	set_player_spawn(nextLevel.get_spawn_point())
-	player.respawn(true)
-	probPlayer.respawn()
-
-
-func _on_Player_died():
-	print("Game over somehow? Did you shoot yourself?")
+	player.spawn(nextLevel.get_spawn_point())
 
 
 func _on_other_self_died():
@@ -87,17 +74,23 @@ func _on_other_self_died():
 	currentLevel.activate_portal()
 
 
-func _on_Player_begin_loop():
+func _on_RecordablePlayer_died():
+	print("Game over somehow? Did you shoot yourself?")
+
+
+func _on_RecordablePlayer_begin_loop():
 	if player.has_recorded_data() and other_self == null:
+		player.stop_recording()  # Stop recording then...
+		
+		# Deactivate the portal
 		currentLevel.deactivate_portal()
-		other_self = Utils.instance_scene_on_main(Player, player.spawn_point)
-		other_self.set_is_clone()
+		
+		# And create the clone
+		other_self = Utils.instance_scene_on_main(PlaybackPlayer, player.get_record_start_point())
 		other_self.connect("died", self, "_on_other_self_died")
-		other_self.recorded_data = player.take_recorded_data()
-		other_self.start_playback(true)
-		player.respawn(true)
-		probPlayer.respawn()
+		other_self.set_playback_data(player.take_recorded_data())
+		other_self.start_playback()
 
 
-func _on_Player_level_complete(level_portal):
+func _on_RecordablePlayer_exit_level(level_portal):
 	call_deferred("change_levels", level_portal)

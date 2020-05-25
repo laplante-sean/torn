@@ -1,49 +1,49 @@
-extends "res://Player/RecordablePlayer.gd"
+extends KinematicBody2D
 class_name Player
 
 signal died
-signal begin_loop
-signal level_complete(level_portal)
 
 const PlayerBullet = preload("res://Player/PlayerBullet.tscn")
 
 export(int) var ACCELERATION = 500
 export(int) var MAX_SPEED = 65
 export(float) var FRICTION = 0.25
-export(int) var BULLET_SPEED = 350
+export(int) var BULLET_SPEED = 250
 export(int) var GRAVITY = 200
 export(int) var JUMP_FORCE = 120
 export(int) var MAX_SLOPE_ANGLE = 46
+export(bool) var follow_mouse = true
 
 enum PlayerState {
 	MOVE,
 	DIE
 }
 
-var MainInstances = Utils.get_MainInstances()
-
+var InputHelper = Utils.get_InputHelper()
 var state = PlayerState.MOVE
-var time_scale = 1.0
 var snap_vector = Vector2.ZERO
 var just_jumped = false
+var motion = Vector2.ZERO
+var spawn_point = Vector2.ZERO
 
-onready var animationPlayer = $AnimationPlayer
+onready var sprite = $PlayerSprite/Sprite
+onready var animationPlayer = $PlayerSprite/AnimationPlayer
 onready var coyoteJumpTimer = $CoyoteJumpTimer
-onready var muzzle = $Sprite/PlayerGun/Sprite/Muzzle
+onready var muzzle = $PlayerSprite/Sprite/PlayerGun/Sprite/Muzzle
+onready var gun = $PlayerSprite/Sprite/PlayerGun
 onready var fireBulletTimer = $FireBulletTimer
 onready var hurtbox = $Hurtbox
 
 
 func _ready():
-	MainInstances.player = self  # So we can access the player everywhere
+	spawn_point = global_position
 
 
-func _physics_process(delta):
-	parse_inputs() # Need to call this first. Implemented in RecordablePlayer
-
-	if is_action_just_pressed("start_loop"):
-		emit_signal("begin_loop")
-
+func process_input(delta):
+	"""
+	Called from the _physics_process callbacks of inherited scenes
+	to update player position, and physics based on input.
+	"""
 	match state:
 		PlayerState.MOVE:
 			var input_vector = get_input_vector()
@@ -61,7 +61,32 @@ func _physics_process(delta):
 			pass  # Do nothing, we're dying
 
 
+func spawn(loc):
+	"""
+	Called to spawn the player. Sets the spawn point
+	and moves the player to it. If this method is not
+	called, the spawn point will be set to the player's
+	position in the _ready() callback.
+	
+	:param loc: The location to spawn the player
+	"""
+	spawn_point = loc
+	respawn()
+
+
+func respawn():
+	"""
+	Respawn the player.
+	"""
+	global_position = spawn_point
+	motion = Vector2.ZERO
+	state = PlayerState.MOVE
+
+
 func fire_bullet():
+	"""
+	Instance a bullet and fire it
+	"""
 	var bullet = Utils.instance_scene_on_main(PlayerBullet, muzzle.global_position)
 	bullet.velocity = Vector2.RIGHT.rotated(gun.rotation) * BULLET_SPEED
 	bullet.velocity.x *= sprite.scale.x
@@ -70,28 +95,50 @@ func fire_bullet():
 
 
 func get_input_vector():
+	"""
+	Get the current input vector (left or right) for movement
+	
+	:returns: The input vector
+	"""
 	var input_vector = Vector2.ZERO
 	input_vector.x = get_action_strength("ui_right") - get_action_strength("ui_left")
 	return input_vector
 
 
 func apply_horizontal_force(input_vector, delta):
+	"""
+	Based on the input vector and delta, apply horizontal motion
+	
+	:param input_vector: The current input_vector returned from get_input_vector
+	:param delta: The current delta from _physics_process
+	"""
 	if input_vector.x != 0:
 		motion.x += input_vector.x * ACCELERATION * delta
 		motion.x = clamp(motion.x, -MAX_SPEED, MAX_SPEED)
 
 
 func apply_friction(input_vector):
+	"""
+	Apply friction to the motion if we're on the floor and we're not moving
+	
+	:param input_vector: The current input_vector returned from get_input_vector
+	"""
 	if input_vector.x == 0 and is_on_floor():
 		motion.x = lerp(motion.x, 0, FRICTION)
 
 
 func update_snap_vector():
+	"""
+	Update our snap vector if we're on the floor
+	"""
 	if is_on_floor():
 		snap_vector = Vector2.DOWN
 
 
 func jump_check():
+	"""
+	Check if we're jumping or not.
+	"""
 	if is_on_floor() or coyoteJumpTimer.time_left > 0:
 		if is_action_just_pressed("jump"):
 			jump(JUMP_FORCE)
@@ -101,21 +148,40 @@ func jump_check():
 
 
 func jump(force):
+	"""
+	Apply a force in the upward direction to make the player jump
+	
+	:param force: The jump force to apply
+	"""
 	motion.y = -force
 	snap_vector = Vector2.ZERO
 
 
 func apply_gravity(delta):
+	"""
+	Apply gravity to the player if we're in the air
+	
+	:param delta: The current delta from _physics_process
+	"""
 	if not is_on_floor():
 		motion.y += GRAVITY * delta
 		motion.y = min(motion.y, JUMP_FORCE)
 
 
 func update_animations(input_vector):
-	if not is_playback:
-		var facing = sign(get_local_mouse_position().x)
-		if facing != 0:
-			sprite.scale.x = facing
+	"""
+	Update our animations based on the input_vector
+	
+	:param input_vector: The current input_vector returned from get_input_vector
+	"""
+	var facing = 1
+	if follow_mouse:
+		facing = sign(get_local_mouse_position().x)
+	else:
+		facing = input_vector.x
+
+	if facing != 0:
+		sprite.scale.x = facing
 
 	if input_vector.x != 0:
 		animationPlayer.play("Run")
@@ -132,6 +198,9 @@ func update_animations(input_vector):
 
 
 func move():
+	"""
+	Final step: Actually move the player
+	"""
 	# Capture properties of motion prior to moving
 	# We use them after moving to fix some
 	# move_and_slide_with_snap issues
@@ -162,35 +231,62 @@ func move():
 		position.x = last_position.x
 
 
-func set_is_clone():
-	# Turn off player layer and turn on ClonePlayer layer
-	set_collision_layer_bit(1, false)
-	set_collision_layer_bit(3, true)
-	
-	# Turn off player hurtbox and turn on clone player hurtbox layer
-	hurtbox.set_collision_layer_bit(2, false)
-	hurtbox.set_collision_layer_bit(4, true)
-
-	# Set clone semi-transparent
-	sprite.modulate = Color(1, 1, 1, 0.65)
-
-
-func set_is_probable_future():
-	set_is_clone()  # This is a clone
-	
-	# But should be more transparent
-	sprite.modulate = Color(1, 1, 1, 0.45)
-	
-	# Should not be killable
-	hurtbox.set_collision_layer_bit(4, false)
-	
-	# And should not collide with dynamic world items (doors, boxes, etc...)
-	set_collision_mask_bit(5, false)
-
-
 func _on_Hurtbox_hit(damage):
+	"""
+	Called if our hurtbox is hit with an amount of damage to apply
+	
+	:param damage: The amount of damage done to the player
+	"""
 	emit_signal("died")
-	state = PlayerState.DIE
-	gun.visible = false
 	motion = Vector2.ZERO
+	state = PlayerState.DIE
 	animationPlayer.play("Die")
+
+
+func _on_PlayerSprite_death_animation_complete():
+	"""
+	When we run our 'Die' animation it triggers the nested 'Die' animation
+	of the player's gun as well. When both those are done playing, this method
+	will be called. Now we can free the player sprite.
+	"""
+	queue_free()
+
+
+func get_action_strength(input):
+	"""
+	Method that can be overridden by spcialized 'Player' classes to change
+	where we get the input from. By default we get it from the human
+	
+	:param input: The current input
+	"""
+	return Input.get_action_strength(input)
+
+
+func is_action_just_pressed(input):
+	"""
+	Method that can be overridden by spcialized 'Player' classes to change
+	where we get the input from. By default we get it from the human
+	
+	:param input: The current input
+	"""
+	return Input.is_action_just_pressed(input)
+
+
+func is_action_just_released(input):
+	"""
+	Method that can be overridden by spcialized 'Player' classes to change
+	where we get the input from. By default we get it from the human
+	
+	:param input: The current input
+	"""
+	return Input.is_action_just_released(input)
+
+
+func is_action_pressed(input):
+	"""
+	Method that can be overridden by spcialized 'Player' classes to change
+	where we get the input from. By default we get it from the human
+	
+	:param input: The current input
+	"""
+	return Input.is_action_pressed(input)

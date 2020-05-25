@@ -15,7 +15,7 @@ func set_active(value):
 	if value:
 		sprite.frame = 1
 		if player != null:
-			player.emit_signal("level_complete", self)
+			player.emit_signal("exit_level", self)
 	else:
 		sprite.frame = 0
 
@@ -23,4 +23,4 @@ func set_active(value):
 func _on_PlayerDetector_body_entered(player):
 	self.player = player
 	if self.active:
-		player.emit_signal("level_complete", self)
+		player.emit_signal("exit_level", self)

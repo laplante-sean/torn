@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Player/PlaybackPlayer.gd" type="Script" id=2]
+
+[node name="PlaybackPlayer" instance=ExtResource( 1 )]
+collision_layer = 8
+script = ExtResource( 2 )
+follow_mouse = false
+
+[node name="PlayerGun" parent="PlayerSprite/Sprite" index="0"]
+follow_mouse = false
+
+[node name="Hurtbox" parent="." index="2"]
+collision_layer = 16
+
+[editable path="PlayerSprite"]
+
+[editable path="Hurtbox"]

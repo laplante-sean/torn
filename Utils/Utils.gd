@@ -27,3 +27,24 @@ func get_MainInstances():
 	:returns: The MainInstances resource.
 	"""
 	return ResourceLoader.load("res://MainInstances/MainInstances.tres")
+
+
+func get_InputHelper():
+	"""
+	Helper method to load our InputHelper resource which
+	is where we store some shared code for the RecordablePlayer
+	and PlaybackPlayer objects
+	
+	:returns: The InputHelper resource
+	"""
+	return ResourceLoader.load("res://InputHelper/InputHelper.tres")
+
+
+func get_player():
+	"""
+	Helper method to get the player instance from MainInstances
+	
+	:returns: The global player instance or null if not set
+	"""
+	var main = get_MainInstances()
+	return main.player

@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Levels/Level_00.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Player/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player/RecordablePlayer.tscn" type="PackedScene" id=2]
 [ext_resource path="res://World/Camera.tscn" type="PackedScene" id=3]
 [ext_resource path="res://World/World.gd" type="Script" id=4]
 
@@ -14,17 +14,15 @@ current = true
 process_mode = 0
 smoothing_enabled = true
 
-[node name="ProbabilityPlayer" parent="." instance=ExtResource( 2 )]
-show_behind_parent = true
+[node name="RecordablePlayer" parent="." instance=ExtResource( 2 )]
+collision_mask = 33
 
-[node name="Player" parent="." instance=ExtResource( 2 )]
-
-[node name="CameraFollow" parent="Player" index="0"]
+[node name="CameraFollow" parent="RecordablePlayer" index="0"]
 remote_path = NodePath("../../Camera")
 
 [node name="Level_00" parent="." instance=ExtResource( 1 )]
-[connection signal="begin_loop" from="Player" to="." method="_on_Player_begin_loop"]
-[connection signal="died" from="Player" to="." method="_on_Player_died"]
-[connection signal="level_complete" from="Player" to="." method="_on_Player_level_complete"]
+[connection signal="begin_loop" from="RecordablePlayer" to="." method="_on_RecordablePlayer_begin_loop"]
+[connection signal="died" from="RecordablePlayer" to="." method="_on_RecordablePlayer_died"]
+[connection signal="exit_level" from="RecordablePlayer" to="." method="_on_RecordablePlayer_exit_level"]
 
-[editable path="Player"]
+[editable path="RecordablePlayer"]
