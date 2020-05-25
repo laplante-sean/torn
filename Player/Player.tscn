@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Player/player.png" type="Texture" id=1]
 [ext_resource path="res://Player/Player.gd" type="Script" id=2]
@@ -9,6 +9,36 @@
 extents = Vector2( 4, 10 )
 
 [sub_resource type="Animation" id=2]
+resource_name = "Die"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 10, 11, 12, 13, 14 ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0.4 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "queue_free"
+} ]
+}
+
+[sub_resource type="Animation" id=3]
 length = 0.8
 loop = true
 tracks/0/type = "value"
@@ -24,8 +54,7 @@ tracks/0/keys = {
 "values": [ 0, 1, 2, 3 ]
 }
 
-[sub_resource type="Animation" id=3]
-resource_name = "Jump"
+[sub_resource type="Animation" id=4]
 length = 0.1
 loop = true
 tracks/0/type = "value"
@@ -41,7 +70,7 @@ tracks/0/keys = {
 "values": [ 9 ]
 }
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id=5]
 length = 0.8
 loop = true
 tracks/0/type = "value"
@@ -57,11 +86,12 @@ tracks/0/keys = {
 "values": [ 7, 8, 7, 6, 5, 4, 5, 6 ]
 }
 
-[sub_resource type="RectangleShape2D" id=5]
+[sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 4, 10 )
 
 [node name="Player" type="KinematicBody2D"]
 collision_layer = 2
+collision_mask = 33
 script = ExtResource( 2 )
 
 [node name="CameraFollow" type="RemoteTransform2D" parent="."]
@@ -69,8 +99,8 @@ script = ExtResource( 2 )
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 0, -8 )
 texture = ExtResource( 1 )
-hframes = 10
-frame = 9
+hframes = 15
+frame = 10
 
 [node name="PlayerGun" parent="Sprite" instance=ExtResource( 3 )]
 show_behind_parent = true
@@ -82,9 +112,10 @@ shape = SubResource( 1 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 autoplay = "Idle"
-anims/Idle = SubResource( 2 )
-anims/Jump = SubResource( 3 )
-anims/Run = SubResource( 4 )
+anims/Die = SubResource( 2 )
+anims/Idle = SubResource( 3 )
+anims/Jump = SubResource( 4 )
+anims/Run = SubResource( 5 )
 
 [node name="CoyoteJumpTimer" type="Timer" parent="."]
 wait_time = 0.2
@@ -99,7 +130,7 @@ one_shot = true
 
 [node name="Collider" parent="Hurtbox" index="0"]
 position = Vector2( 0, -2 )
-shape = SubResource( 5 )
+shape = SubResource( 6 )
 [connection signal="hit" from="Hurtbox" to="." method="_on_Hurtbox_hit"]
 
 [editable path="Hurtbox"]

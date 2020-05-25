@@ -60,6 +60,7 @@ tracks/3/keys = {
 
 [node name="Door" type="StaticBody2D"]
 position = Vector2( 0, -8 )
+collision_layer = 32
 collision_mask = 0
 script = ExtResource( 2 )
 

@@ -16,7 +16,8 @@ export(int) var JUMP_FORCE = 120
 export(int) var MAX_SLOPE_ANGLE = 46
 
 enum PlayerState {
-	MOVE
+	MOVE,
+	DIE
 }
 
 var MainInstances = Utils.get_MainInstances()
@@ -54,8 +55,10 @@ func _physics_process(delta):
 			update_animations(input_vector)
 			move()
 
-	if is_action_pressed("fire") and fireBulletTimer.time_left == 0:
-		fire_bullet()
+			if is_action_pressed("fire") and fireBulletTimer.time_left == 0:
+				fire_bullet()
+		PlayerState.DIE:
+			pass  # Do nothing, we're dying
 
 
 func fire_bullet():
@@ -168,7 +171,26 @@ func set_is_clone():
 	hurtbox.set_collision_layer_bit(2, false)
 	hurtbox.set_collision_layer_bit(4, true)
 
+	# Set clone semi-transparent
+	sprite.modulate = Color(1, 1, 1, 0.65)
+
+
+func set_is_probable_future():
+	set_is_clone()  # This is a clone
+	
+	# But should be more transparent
+	sprite.modulate = Color(1, 1, 1, 0.45)
+	
+	# Should not be killable
+	hurtbox.set_collision_layer_bit(4, false)
+	
+	# And should not collide with dynamic world items (doors, boxes, etc...)
+	set_collision_mask_bit(5, false)
+
 
 func _on_Hurtbox_hit(damage):
 	emit_signal("died")
-	queue_free()
+	state = PlayerState.DIE
+	gun.visible = false
+	motion = Vector2.ZERO
+	animationPlayer.play("Die")

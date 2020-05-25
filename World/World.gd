@@ -8,6 +8,7 @@ export(float) var MAX_ZOOM = 2
 
 onready var currentLevel = $Level_00
 onready var player = $Player
+onready var probPlayer = $ProbabilityPlayer
 onready var camera = $Camera
 
 var other_self = null  # If a loop is playing this holds the other self
@@ -17,6 +18,15 @@ func _ready():
 	# So the background defaults to black on every frame
 	VisualServer.set_default_clear_color(Color.black)
 	player.connect("hit_door", self, "_on_Player_hit_door")
+	set_player_spawn(currentLevel.get_spawn_point())
+	probPlayer.set_is_probable_future()
+
+
+func set_player_spawn(set_pos):
+	player.global_position = set_pos
+	player.spawn_point = player.global_position
+	probPlayer.global_position = player.global_position
+	probPlayer.spawn_point = player.global_position
 
 
 func _process(delta):
@@ -53,6 +63,7 @@ func reload_level():
 		other_self = null
 		currentLevel.activate_portal()
 	player.respawn(true)
+	probPlayer.respawn()
 
 
 func change_levels(level_portal):
@@ -61,8 +72,9 @@ func change_levels(level_portal):
 	currentLevel.queue_free()
 	var nextLevel = NextLevel.instance()
 	add_child(nextLevel)
-	player.spawn_point = nextLevel.get_spawn_point()
+	set_player_spawn(nextLevel.get_spawn_point())
 	player.respawn(true)
+	probPlayer.respawn()
 
 
 func _on_Player_died():
@@ -84,6 +96,7 @@ func _on_Player_begin_loop():
 		other_self.recorded_data = player.take_recorded_data()
 		other_self.start_playback(true)
 		player.respawn(true)
+		probPlayer.respawn()
 
 
 func _on_Player_level_complete(level_portal):

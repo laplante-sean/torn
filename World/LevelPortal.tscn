@@ -4,7 +4,7 @@
 [ext_resource path="res://World/level-portal-sheet.png" type="Texture" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 13, 3 )
+extents = Vector2( 7, 2 )
 
 [node name="LevelPortal" type="StaticBody2D"]
 collision_mask = 0
@@ -25,6 +25,6 @@ collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerDetector"]
-position = Vector2( 0, -5 )
+position = Vector2( 0, -4 )
 shape = SubResource( 1 )
 [connection signal="body_entered" from="PlayerDetector" to="." method="_on_PlayerDetector_body_entered"]

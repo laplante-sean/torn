@@ -10,19 +10,19 @@ script = ExtResource( 4 )
 MAX_ZOOM = 4.0
 
 [node name="Camera" parent="." instance=ExtResource( 3 )]
-position = Vector2( 208, 257 )
 current = true
 process_mode = 0
 smoothing_enabled = true
 
+[node name="ProbabilityPlayer" parent="." instance=ExtResource( 2 )]
+show_behind_parent = true
+
 [node name="Player" parent="." instance=ExtResource( 2 )]
-position = Vector2( 208, 257 )
 
 [node name="CameraFollow" parent="Player" index="0"]
 remote_path = NodePath("../../Camera")
 
 [node name="Level_00" parent="." instance=ExtResource( 1 )]
-position = Vector2( 0, 0.307373 )
 [connection signal="begin_loop" from="Player" to="." method="_on_Player_begin_loop"]
 [connection signal="died" from="Player" to="." method="_on_Player_died"]
 [connection signal="level_complete" from="Player" to="." method="_on_Player_level_complete"]
