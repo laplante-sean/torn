@@ -6,7 +6,6 @@
 
 [node name="World" type="Node"]
 script = ExtResource( 4 )
-start_level_path = "res://Levels/Level_02.tscn"
 MAX_ZOOM = 4.0
 
 [node name="Camera" parent="." instance=ExtResource( 3 )]

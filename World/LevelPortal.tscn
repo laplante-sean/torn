@@ -28,3 +28,4 @@ collision_mask = 2
 position = Vector2( 0, -4 )
 shape = SubResource( 1 )
 [connection signal="body_entered" from="PlayerDetector" to="." method="_on_PlayerDetector_body_entered"]
+[connection signal="body_exited" from="PlayerDetector" to="." method="_on_PlayerDetector_body_exited"]

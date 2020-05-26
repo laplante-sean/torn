@@ -13,7 +13,7 @@ var record_point = Vector2.ZERO  # Point we hit the record button
 
 func _ready():
 	MainInstances.player = self
-	spawn_point = global_position
+	record_point = global_position
 
 
 func _physics_process(delta):
@@ -30,7 +30,6 @@ func _physics_process(delta):
 		record()
 
 	if is_action_just_pressed("start_loop"):
-		loop_respawn()  # We go back to the beginning of the loop too
 		emit_signal("begin_loop")
 
 	frame_count += 1
@@ -103,7 +102,7 @@ func clear_recording():
 	stop_recording()  # Make sure we're stopped
 	frame_count = 0
 	recorded_data = []
-	record_point = Vector2.ZERO
+	record_point = spawn_point  # Fallback to spawn point
 
 
 func record():

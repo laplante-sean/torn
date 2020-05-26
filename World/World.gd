@@ -86,12 +86,17 @@ func _on_RecordablePlayer_died():
 
 func _on_RecordablePlayer_begin_loop():
 	if player.has_recorded_data() and other_self == null:
-		player.stop_recording()  # Stop recording then...
+		# First, stop recording
+		player.stop_recording()  
 		
-		# Deactivate the portal
+		# Then, respawn to the beginning of the loop
+		player.loop_respawn()
+		
+		# Next, Deactivate the portal level portal since you cannot move on
+		# with an active loop.
 		currentLevel.deactivate_portal()
 		
-		# And create the clone
+		# Finally, create the looping clone and start playback
 		other_self = Utils.instance_scene_on_main(PlaybackPlayer, player.get_record_start_point())
 		other_self.connect("died", self, "_on_other_self_died")
 		other_self.set_playback_data(player.take_recorded_data())

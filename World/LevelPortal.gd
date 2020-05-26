@@ -24,3 +24,7 @@ func _on_PlayerDetector_body_entered(player):
 	self.player = player
 	if self.active:
 		player.emit_signal("exit_level", self)
+
+
+func _on_PlayerDetector_body_exited(body):
+	self.player = null

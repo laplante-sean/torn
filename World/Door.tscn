@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 4, 24 )
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=2]
 resource_name = "Close"
 length = 0.2
 step = 0.05
@@ -107,8 +107,7 @@ tracks/7/keys = {
 "values": [ Vector2( 4, 4 ), Vector2( 4, 24 ) ]
 }
 
-[sub_resource type="Animation" id=2]
-resource_name = "Open"
+[sub_resource type="Animation" id=3]
 length = 0.2
 step = 0.05
 tracks/0/type = "value"
@@ -229,5 +228,5 @@ position = Vector2( 0, -16 )
 shape = SubResource( 1 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/Close = SubResource( 3 )
-anims/Open = SubResource( 2 )
+anims/Close = SubResource( 2 )
+anims/Open = SubResource( 3 )
