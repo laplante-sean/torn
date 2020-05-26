@@ -8,4 +8,4 @@ func open():
 
 
 func close():
-	animationPlayer.play_backwards("Open")
+	animationPlayer.play("Close")

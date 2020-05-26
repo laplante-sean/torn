@@ -1,7 +1,7 @@
 extends Node
 
 
-func instance_scene_on_main(packed_scene, position):
+func instance_scene_on_main(packed_scene, position=Vector2.ZERO):
 	"""
 	Helper method that takes a packed scene, creates an instance
 	of it, then adds it as a child to the current scene, sets the

@@ -4,11 +4,6 @@ onready var spawnPoint = $SpawnPoint
 onready var levelPortal = $LevelPortal
 
 
-func _ready():
-	var parent = get_parent()
-	parent.currentLevel = self
-
-
 func get_spawn_point():
 	return spawnPoint.global_position
 

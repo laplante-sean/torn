@@ -8,6 +8,9 @@ collision_layer = 8
 script = ExtResource( 2 )
 follow_mouse = false
 
+[node name="PlayerSprite" parent="." index="0"]
+modulate = Color( 1, 1, 1, 0.392157 )
+
 [node name="PlayerGun" parent="PlayerSprite/Sprite" index="0"]
 follow_mouse = false
 

@@ -30,6 +30,7 @@ func _physics_process(delta):
 		record()
 
 	if is_action_just_pressed("start_loop"):
+		loop_respawn()  # We go back to the beginning of the loop too
 		emit_signal("begin_loop")
 
 	frame_count += 1
@@ -41,6 +42,15 @@ func respawn():
 	"""
 	clear_recording()
 	.respawn()  # Call base Player class respawn()
+
+
+func loop_respawn():
+	"""
+	Respawn the player at the previously set record point.
+	"""
+	global_position = record_point
+	motion = Vector2.ZERO
+	state = PlayerState.MOVE
 
 
 func has_recorded_data():
