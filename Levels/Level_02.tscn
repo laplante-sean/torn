@@ -28,3 +28,4 @@ position = Vector2( 200, 160 )
 
 [node name="LevelPortal" parent="." index="6"]
 position = Vector2( 445, 143 )
+next_level_path = "res://Levels/Level_03.tscn"
