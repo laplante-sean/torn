@@ -20,6 +20,7 @@ enum PlayerState {
 }
 
 var InputHelper = Utils.get_InputHelper()
+var MainInstances = Utils.get_MainInstances()
 var state = PlayerState.MOVE
 var snap_vector = Vector2.ZERO
 var just_jumped = false
@@ -241,6 +242,9 @@ func _on_Hurtbox_hit(damage):
 	motion = Vector2.ZERO
 	state = PlayerState.DIE
 	animationPlayer.play("Die")
+	if MainInstances.timeMarker != null:
+		MainInstances.timeMarker.queue_free()
+		MainInstances.timeMarker = null
 
 
 func _on_PlayerSprite_death_animation_complete():

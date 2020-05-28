@@ -1,10 +1,11 @@
 extends Player
 class_name RecordablePlayer
 
+const TimeMarker = preload("res://World/TimeMarker.tscn")
+
 signal begin_loop
 signal exit_level(level_portal)
 
-var MainInstances = Utils.get_MainInstances()
 var frame_count = 0  # Keeps count of the physics frames while we're recording/playing-back
 var recorded_data = []  # The recorded data for a session
 var is_recording = true  # Whether or not we're recording  TODO - Default to false
@@ -86,6 +87,8 @@ func start_recording():
 	clear_recording()
 	record_point = global_position
 	is_recording = true
+	var marker = Utils.instance_scene_on_main(TimeMarker, record_point)
+	MainInstances.timeMarker = marker
 
 
 func stop_recording():

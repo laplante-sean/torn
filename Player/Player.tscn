@@ -15,13 +15,14 @@ collision_layer = 2
 script = ExtResource( 2 )
 
 [node name="PlayerSprite" parent="." instance=ExtResource( 1 )]
+position = Vector2( 0, -9 )
 
 [node name="Collider" type="CollisionShape2D" parent="."]
-position = Vector2( 0, -1 )
+position = Vector2( 0, -10 )
 shape = SubResource( 1 )
 
 [node name="Hurtbox" parent="." instance=ExtResource( 4 )]
-position = Vector2( 0, -1 )
+position = Vector2( 0, -9 )
 
 [node name="Collider" parent="Hurtbox" index="0"]
 shape = SubResource( 2 )
