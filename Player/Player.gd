@@ -2,6 +2,7 @@ extends KinematicBody2D
 class_name Player
 
 signal died
+signal rewind_complete
 
 const PlayerBullet = preload("res://Player/PlayerBullet.tscn")
 
@@ -16,6 +17,7 @@ export(bool) var follow_mouse = true
 
 enum PlayerState {
 	MOVE,
+	REWIND,
 	DIE
 }
 
@@ -26,6 +28,9 @@ var just_jumped = false
 var motion = Vector2.ZERO
 var spawn_point = Vector2.ZERO
 var time_marker = null  # The current time marker
+var rewind_data = []   # Stores a list of positions and animation states for rewinding
+var rewind_idx = 0     # When rewinding, stores the index
+var current_animation = "Idle"
 
 onready var sprite = $PlayerSprite/Sprite
 onready var animationPlayer = $PlayerSprite/AnimationPlayer
@@ -58,6 +63,8 @@ func process_input(delta):
 
 			if is_action_pressed("fire") and fireBulletTimer.time_left == 0:
 				fire_bullet()
+		PlayerState.REWIND:
+			rewind()
 		PlayerState.DIE:
 			pass  # Do nothing, we're dying
 
@@ -82,6 +89,7 @@ func respawn():
 	global_position = spawn_point
 	motion = Vector2.ZERO
 	state = PlayerState.MOVE
+	gun.follow_mouse = true
 
 
 func fire_bullet():
@@ -104,6 +112,15 @@ func get_input_vector():
 	var input_vector = Vector2.ZERO
 	input_vector.x = get_action_strength("ui_right") - get_action_strength("ui_left")
 	return input_vector
+
+
+func get_current_animation():
+	"""
+	Returns the currently active animation by name
+	
+	:returns: Current animation name
+	"""
+	return current_animation
 
 
 func apply_horizontal_force(input_vector, delta):
@@ -198,17 +215,19 @@ func update_animations(input_vector):
 		sprite.scale.x = facing
 
 	if input_vector.x != 0:
-		animationPlayer.play("Run")
+		current_animation = "Run"
 		# Play animation in reverse when player runs backwards
 		animationPlayer.playback_speed = input_vector.x * sprite.scale.x
 	else:
+		current_animation = "Idle"
 		# Idle animation should never play in reverse
 		animationPlayer.playback_speed = 1
-		animationPlayer.play("Idle")
 
 	# Override run/idle if we're in the air
 	if not is_on_floor():
-		animationPlayer.play("Jump")
+		current_animation = "Jump"
+
+	animationPlayer.play(current_animation)
 
 
 func move():
@@ -243,6 +262,37 @@ func move():
 	if is_on_floor() and get_floor_velocity().length() == 0 and abs(motion.x) < 1:
 		# If we're on the floor, not on a moving platform, and our motion is super tiny...don't move
 		position.x = last_position.x
+
+
+func start_rewind():
+	"""
+	Set the rewind_idx to start
+	"""
+	rewind_idx = len(rewind_data)
+	state = PlayerState.REWIND
+	gun.follow_mouse = false
+
+
+func rewind():
+	"""
+	Visually rewind a player
+	"""
+	rewind_idx -= 1
+
+	if rewind_idx < 0:
+		rewind_idx = 0
+		emit_signal("rewind_complete")
+		state = PlayerState.MOVE
+		animationPlayer.playback_speed = 1
+		gun.follow_mouse = true
+		return
+
+	var frame = rewind_data[rewind_idx]
+	global_position = frame.position
+	sprite.scale.x = frame.facing
+	gun.rotation = frame.gun_rotation
+	animationPlayer.playback_speed = sprite.scale.x * -1  # Flip it
+	animationPlayer.play(frame.animation)
 
 
 func _on_Hurtbox_hit(damage):

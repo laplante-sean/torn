@@ -120,6 +120,8 @@ func clear_recording():
 	stop_recording()  # Make sure we're stopped
 	frame_count = 0
 	recorded_data = []
+	rewind_data = []
+	rewind_idx = 0
 	record_point = spawn_point  # Fallback to spawn point
 
 
@@ -133,6 +135,12 @@ func record():
 		"position": global_position,       # Global position for sanity checking
 		"facing": sprite.scale.x,          # The direction we're facing
 		"gun_rotation": gun.rotation       # The player's gun rotation
+	}
+	var rewind_record = {
+		"position": global_position,
+		"facing": sprite.scale.x,
+		"gun_rotation": gun.rotation,
+		"animation": get_current_animation()
 	}
 
 	# We only parse out JUST_PRESSED and JUST_RELEASED actions (all we need)
@@ -158,3 +166,6 @@ func record():
 	# Save to our global recorded_data struct if there were any inputs
 	if len(current_record.inputs) > 0:
 		recorded_data.push_back(current_record)
+		
+	# Save to our global rewind_data struct no matter what
+	rewind_data.push_back(rewind_record)

@@ -99,15 +99,15 @@ func get_input_action(input):
 
 
 func playback():
+	if state == PlayerState.DIE:
+		return  # We're dying just let it happen
+	
 	if record_idx == len(playback_data):
-		if state == PlayerState.DIE:
-			return  # We're dying just let it happen
 		stop_playback()
 		clear_inputs()  # Don't want to leave anything pressed
 		start_playback()
 		respawn()
 		return
-	
 
 	if frame_count != playback_data[record_idx].frame:
 		return  # We're not at the physics frame for the next record yet

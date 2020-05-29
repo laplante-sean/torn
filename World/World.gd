@@ -95,9 +95,11 @@ func reconstruct_player(at_position):
 	player.global_position = at_position
 	player.cameraFollow.set_remote_node("../../Camera")
 	
+	# Reconnect all the signals
 	player.connect("died", self, "_on_RecordablePlayer_died")
 	player.connect("begin_loop", self, "_on_RecordablePlayer_begin_loop")
 	player.connect("exit_level", self, "_on_RecordablePlayer_exit_level")
+	player.connect("rewind_complete", self, "_on_RecordablePlayer_rewind_complete")
 
 
 func _on_RecordablePlayer_died():
@@ -115,20 +117,26 @@ func _on_RecordablePlayer_begin_loop():
 	if player.has_recorded_data() and other_self == null:
 		# First, stop recording
 		player.stop_recording()  
-		
-		# Then, respawn to the beginning of the loop
-		player.loop_respawn()
-		
-		# Next, Deactivate the portal level portal since you cannot move on
-		# with an active loop.
-		currentLevel.deactivate_portal()
-		
-		# Finally, create the looping clone and start playback
-		other_self = Utils.instance_scene_on_main(PlaybackPlayer, player.get_record_start_point())
-		other_self.connect("died", self, "_on_other_self_died")
-		other_self.set_playback_data(player.take_recorded_data(), player.take_time_marker())
-		other_self.start_playback()
+
+		# Then, start the rewind. When it's done we'll get a signal. Then
+		# we'll start the loop...
+		player.start_rewind()
 
 
 func _on_RecordablePlayer_exit_level(level_portal):
 	call_deferred("change_levels", level_portal)
+
+
+func _on_RecordablePlayer_rewind_complete():
+	# Then, respawn to the beginning of the loop
+	player.loop_respawn()
+	
+	# Next, Deactivate the portal level portal since you cannot move on
+	# with an active loop.
+	currentLevel.deactivate_portal()
+	
+	# Finally, create the looping clone and start playback
+	other_self = Utils.instance_scene_on_main(PlaybackPlayer, player.get_record_start_point())
+	other_self.connect("died", self, "_on_other_self_died")
+	other_self.set_playback_data(player.take_recorded_data(), player.take_time_marker())
+	other_self.start_playback()

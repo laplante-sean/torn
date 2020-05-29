@@ -21,5 +21,6 @@ remote_path = NodePath("../../Camera")
 [connection signal="begin_loop" from="RecordablePlayer" to="." method="_on_RecordablePlayer_begin_loop"]
 [connection signal="died" from="RecordablePlayer" to="." method="_on_RecordablePlayer_died"]
 [connection signal="exit_level" from="RecordablePlayer" to="." method="_on_RecordablePlayer_exit_level"]
+[connection signal="rewind_complete" from="RecordablePlayer" to="." method="_on_RecordablePlayer_rewind_complete"]
 
 [editable path="RecordablePlayer"]
