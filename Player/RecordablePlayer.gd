@@ -8,12 +8,13 @@ signal exit_level(level_portal)
 
 var frame_count = 0  # Keeps count of the physics frames while we're recording/playing-back
 var recorded_data = []  # The recorded data for a session
-var is_recording = true  # Whether or not we're recording  TODO - Default to false
+var is_recording = false  # Whether or not we're recording
 var record_point = Vector2.ZERO  # Point we hit the record button
+
+onready var cameraFollow = $CameraFollow
 
 
 func _ready():
-	MainInstances.player = self
 	record_point = global_position
 
 
@@ -21,11 +22,13 @@ func _physics_process(delta):
 	process_input(delta)  # Actually move the player, update animations, etc.
 	
 	if is_action_just_pressed("start_recording"):
-		if is_on_floor():
+		if not is_moving() and not is_recording:
 			print("Begin recording")
 			start_recording()
-		else:
-			print("Can only begin recordings on floor")
+		elif is_moving():
+			print("Cannot begin recording while moving: ", motion)
+		elif is_recording:
+			print("Cannot begin a recording while one is active")
 	
 	if is_recording:
 		record()
@@ -41,6 +44,7 @@ func respawn():
 	Respawn the player. (overrides base Player class respawn())
 	"""
 	clear_recording()
+	clear_time_marker()
 	.respawn()  # Call base Player class respawn()
 
 
@@ -72,6 +76,18 @@ func take_recorded_data():
 	return ret
 
 
+func take_time_marker():
+	"""
+	This will return the time_marker and set it to NULL
+	so we're no longer managing it.
+	
+	:returns: The current time_marker
+	"""
+	var ret = time_marker
+	time_marker = null
+	return ret
+
+
 func get_record_start_point():
 	"""
 	Helper that gets the global position set when the recording started
@@ -87,8 +103,7 @@ func start_recording():
 	clear_recording()
 	record_point = global_position
 	is_recording = true
-	var marker = Utils.instance_scene_on_main(TimeMarker, record_point)
-	MainInstances.timeMarker = marker
+	time_marker = Utils.instance_scene_on_main(TimeMarker, record_point)
 
 
 func stop_recording():

@@ -34,14 +34,17 @@ func _physics_process(delta):
 	frame_count += 1  # Always increment the frame count
 
 
-func set_playback_data(recorded_data):
+func set_playback_data(recorded_data, tm):
 	"""
 	Used to set the playback data for this playback player. If not called
 	the playback player won't do anything.
 	
 	:param recorded_data: Data recorded by a recorable player to playback
+	:param time_marker: Once playback starts the playback player takes control
+		of the time marker and clears it when dead.
 	"""
 	playback_data = recorded_data
+	time_marker = tm
 
 
 func start_playback():

@@ -20,12 +20,12 @@ enum PlayerState {
 }
 
 var InputHelper = Utils.get_InputHelper()
-var MainInstances = Utils.get_MainInstances()
 var state = PlayerState.MOVE
 var snap_vector = Vector2.ZERO
 var just_jumped = false
 var motion = Vector2.ZERO
 var spawn_point = Vector2.ZERO
+var time_marker = null  # The current time marker
 
 onready var sprite = $PlayerSprite/Sprite
 onready var animationPlayer = $PlayerSprite/AnimationPlayer
@@ -126,6 +126,19 @@ func apply_friction(input_vector):
 	"""
 	if input_vector.x == 0 and is_on_floor():
 		motion.x = lerp(motion.x, 0, FRICTION)
+
+
+func is_moving():
+	"""
+	Helper that returns True if the player is moving and False if not.
+	
+	:returns: True if moving. False if stationary
+	"""
+	if get_input_vector() != Vector2.ZERO:
+		return true
+	if not is_on_floor():
+		return true
+	return false
 
 
 func update_snap_vector():
@@ -238,13 +251,19 @@ func _on_Hurtbox_hit(damage):
 	
 	:param damage: The amount of damage done to the player
 	"""
-	emit_signal("died")
 	motion = Vector2.ZERO
 	state = PlayerState.DIE
 	animationPlayer.play("Die")
-	if MainInstances.timeMarker != null:
-		MainInstances.timeMarker.queue_free()
-		MainInstances.timeMarker = null
+	clear_time_marker()
+
+
+func clear_time_marker():
+	"""
+	Used to clear an existing time marker
+	"""
+	if time_marker != null:
+		time_marker.queue_free()
+		time_marker = null
 
 
 func _on_PlayerSprite_death_animation_complete():
@@ -254,6 +273,7 @@ func _on_PlayerSprite_death_animation_complete():
 	will be called. Now we can free the player sprite.
 	"""
 	queue_free()
+	emit_signal("died")
 
 
 func get_action_strength(input):

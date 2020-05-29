@@ -1,5 +1,6 @@
 extends Node
 
+const RecordablePlayer = preload("res://Player/RecordablePlayer.tscn")
 const PlaybackPlayer = preload("res://Player/PlaybackPlayer.tscn")
 const Level_00 = preload("res://Levels/Level_00.tscn")
 
@@ -64,6 +65,9 @@ func reload_level():
 		other_self = null
 		currentLevel.activate_portal()
 	
+	if player == null:
+		reconstruct_player(currentLevel.get_spawn_point())
+	
 	# Respawn the player (recording will be cleared)
 	player.respawn()
 
@@ -71,6 +75,7 @@ func reload_level():
 func change_levels(level_portal):
 	currentLevel.queue_free()
 	currentLevel = Utils.instance_scene_on_main(load(level_portal.next_level_path))
+	player.clear_time_marker()
 	player.spawn(currentLevel.get_spawn_point())
 
 
@@ -80,8 +85,30 @@ func _on_other_self_died():
 	currentLevel.activate_portal()
 
 
+func reconstruct_player(at_position):
+	"""
+	Remake the player at a certain position
+	
+	:at_position: Where to place the player
+	"""
+	player = Utils.instance_scene_on_main(RecordablePlayer, currentLevel.get_spawn_point())
+	player.global_position = at_position
+	player.cameraFollow.set_remote_node("../../Camera")
+	
+	player.connect("died", self, "_on_RecordablePlayer_died")
+	player.connect("begin_loop", self, "_on_RecordablePlayer_begin_loop")
+	player.connect("exit_level", self, "_on_RecordablePlayer_exit_level")
+
+
 func _on_RecordablePlayer_died():
-	print("Game over somehow? Did you shoot yourself?")
+	player = null
+	
+	if other_self != null:
+		reconstruct_player(other_self.global_position)
+		other_self.clear_time_marker()
+		other_self.queue_free()
+		other_self = null
+		currentLevel.activate_portal()
 
 
 func _on_RecordablePlayer_begin_loop():
@@ -99,7 +126,7 @@ func _on_RecordablePlayer_begin_loop():
 		# Finally, create the looping clone and start playback
 		other_self = Utils.instance_scene_on_main(PlaybackPlayer, player.get_record_start_point())
 		other_self.connect("died", self, "_on_other_self_died")
-		other_self.set_playback_data(player.take_recorded_data())
+		other_self.set_playback_data(player.take_recorded_data(), player.take_time_marker())
 		other_self.start_playback()
 
 
