@@ -277,7 +277,7 @@ func rewind():
 	"""
 	Visually rewind a player
 	"""
-	rewind_idx -= 1
+	rewind_idx -= 2
 
 	if rewind_idx < 0:
 		rewind_idx = 0
