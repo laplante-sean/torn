@@ -1,12 +1,21 @@
 extends Control
 
+var MainInstances = Utils.get_MainInstances()
+
 
 func _ready():
 	VisualServer.set_default_clear_color(Color.black)
 
 
-func _on_StartButton_pressed():
+func load_world():
+	"""
+	Helper function used to change to the World scene
+	"""
 	get_tree().change_scene("res://World/World.tscn")
+
+
+func _on_StartButton_pressed():
+	load_world()
 
 
 func _on_QuitButton_pressed():
@@ -14,4 +23,5 @@ func _on_QuitButton_pressed():
 
 
 func _on_LoadButton_pressed():
-	pass # Replace with function body.
+	MainInstances.is_load_game = true
+	load_world()

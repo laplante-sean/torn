@@ -1,6 +1,9 @@
 # Created by https://www.gitignore.io/api/c++,python,visualstudio
 # Edit at https://www.gitignore.io/?templates=c++,python,visualstudio,godot
 
+### Torn save data ###
+torn_save_data.json
+
 ### Godot ###
 # Godot-specific ignores
 .import/

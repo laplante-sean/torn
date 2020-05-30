@@ -9,16 +9,23 @@ export(float) var CAMERA_ZOOM_STEP = 0.05
 export(float) var MIN_ZOOM = 1
 export(float) var MAX_ZOOM = 2
 
-onready var currentLevel = null
 onready var player = $RecordablePlayer
 onready var camera = $Camera
 
+var MainInstances = Utils.get_MainInstances()
+var currentLevel = null
+var currentLevelPath = "res://Levels/Level_00.tscn"
 var other_self = null  # If a loop is playing this holds the other self
 
 
 func _ready():
-	if start_level_path:
+	if MainInstances.is_load_game:
+		var save_data = SaveAndLoad.load_data_from_file()
+		currentLevelPath = save_data.level
+		currentLevel = Utils.instance_scene_on_main(load(save_data.level))
+	elif start_level_path:
 		# If this is set, use it.
+		currentLevelPath = start_level_path
 		currentLevel = Utils.instance_scene_on_main(load(start_level_path))
 	else:
 		# If not we default to Level_00
@@ -27,6 +34,12 @@ func _ready():
 	# So the background defaults to black on every frame
 	VisualServer.set_default_clear_color(Color.black)
 	player.spawn(currentLevel.get_spawn_point())
+
+
+func update_save_data():
+	var save_data = SaveAndLoad.load_data_from_file()
+	save_data.level = currentLevelPath
+	SaveAndLoad.save_data_to_file(save_data)
 
 
 func _physics_process(_delta):
@@ -74,7 +87,9 @@ func reload_level():
 
 func change_levels(level_portal):
 	currentLevel.queue_free()
+	currentLevelPath = level_portal.next_level_path
 	currentLevel = Utils.instance_scene_on_main(load(level_portal.next_level_path))
+	update_save_data()
 	player.clear_time_marker()
 	player.spawn(currentLevel.get_spawn_point())
 

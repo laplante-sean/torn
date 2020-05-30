@@ -1,4 +1,4 @@
 extends Resource
 class_name MainInstances
 
-# TODO: Do I need this
+var is_load_game = false

@@ -53,6 +53,7 @@ config/icon="res://icon.png"
 
 Utils="*res://Utils/Utils.gd"
 Events="*res://Utils/Events.gd"
+SaveAndLoad="*res://Utils/SaveAndLoad.gd"
 
 [display]
 
