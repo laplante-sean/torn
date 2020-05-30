@@ -8,4 +8,10 @@ script = ExtResource( 2 )
 
 [node name="CameraFollow" type="RemoteTransform2D" parent="." index="0"]
 
+[node name="MaxRecordTimer" type="Timer" parent="." index="6"]
+process_mode = 0
+wait_time = 15.0
+one_shot = true
+[connection signal="timeout" from="MaxRecordTimer" to="." method="_on_MaxRecordTimer_timeout"]
+
 [editable path="Hurtbox"]

@@ -4,6 +4,7 @@ class_name RecordablePlayer
 const TimeMarker = preload("res://World/TimeMarker.tscn")
 
 signal begin_loop
+signal begin_recording
 signal exit_level(level_portal)
 
 var frame_count = 0  # Keeps count of the physics frames while we're recording/playing-back
@@ -12,6 +13,7 @@ var is_recording = false  # Whether or not we're recording
 var record_point = Vector2.ZERO  # Point we hit the record button
 
 onready var cameraFollow = $CameraFollow
+onready var maxRecordTimer = $MaxRecordTimer
 
 
 func _ready():
@@ -104,6 +106,8 @@ func start_recording():
 	record_point = global_position
 	is_recording = true
 	time_marker = Utils.instance_scene_on_main(TimeMarker, record_point)
+	maxRecordTimer.start()
+	emit_signal("begin_recording")
 
 
 func stop_recording():
@@ -111,6 +115,7 @@ func stop_recording():
 	Stop recording actions
 	"""
 	is_recording = false
+	maxRecordTimer.stop()
 
 
 func clear_recording():
@@ -169,3 +174,8 @@ func record():
 		
 	# Save to our global rewind_data struct no matter what
 	rewind_data.push_back(rewind_record)
+
+
+func _on_MaxRecordTimer_timeout():
+	print("Max recording time reached!")
+	emit_signal("begin_loop")

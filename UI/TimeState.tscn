@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://UI/play-icon.png" type="Texture" id=1]
+[ext_resource path="res://UI/record-icon.png" type="Texture" id=2]
+[ext_resource path="res://UI/rewind-icon.png" type="Texture" id=3]
+[ext_resource path="res://UI/TimeState.gd" type="Script" id=4]
+
+[node name="TimeState" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Play" type="TextureRect" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -20.0
+margin_top = 3.0
+margin_right = -4.0
+margin_bottom = 19.0
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Record" type="TextureRect" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -20.0
+margin_top = 3.0
+margin_right = -4.0
+margin_bottom = 19.0
+texture = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Rewind" type="TextureRect" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -20.0
+margin_top = 3.0
+margin_right = -4.0
+margin_bottom = 19.0
+texture = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}

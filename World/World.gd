@@ -100,6 +100,7 @@ func reconstruct_player(at_position):
 	player.connect("begin_loop", self, "_on_RecordablePlayer_begin_loop")
 	player.connect("exit_level", self, "_on_RecordablePlayer_exit_level")
 	player.connect("rewind_complete", self, "_on_RecordablePlayer_rewind_complete")
+	player.connect("begin_recording", self, "_on_RecordablePlayer_begin_recording")
 
 
 func _on_RecordablePlayer_died():
@@ -116,11 +117,13 @@ func _on_RecordablePlayer_died():
 func _on_RecordablePlayer_begin_loop():
 	if player.has_recorded_data() and other_self == null:
 		# First, stop recording
-		player.stop_recording()  
+		player.stop_recording()
 
 		# Then, start the rewind. When it's done we'll get a signal. Then
 		# we'll start the loop...
 		player.start_rewind()
+		
+		Events.emit_signal("player_recording_complete")
 
 
 func _on_RecordablePlayer_exit_level(level_portal):
@@ -140,3 +143,9 @@ func _on_RecordablePlayer_rewind_complete():
 	other_self.connect("died", self, "_on_other_self_died")
 	other_self.set_playback_data(player.take_recorded_data(), player.take_time_marker())
 	other_self.start_playback()
+	
+	Events.emit_signal("player_rewind_complete")
+
+
+func _on_RecordablePlayer_begin_recording():
+	Events.emit_signal("player_started_recording")

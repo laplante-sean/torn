@@ -1,0 +1,5 @@
+extends Node
+
+signal player_started_recording
+signal player_recording_complete
+signal player_rewind_complete

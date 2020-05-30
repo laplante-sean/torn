@@ -1,0 +1,57 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Menus/StartMenu.gd" type="Script" id=1]
+[ext_resource path="res://Menus/MenuTheme.tres" type="Theme" id=2]
+
+[node name="StartMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 119.0
+margin_top = 40.0
+margin_right = 201.0
+margin_bottom = 140.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_right = 82.0
+margin_bottom = 22.0
+text = "Torn"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Gap" type="HSeparator" parent="VBoxContainer"]
+margin_top = 26.0
+margin_right = 82.0
+margin_bottom = 30.0
+
+[node name="StartButton" type="Button" parent="VBoxContainer"]
+margin_top = 34.0
+margin_right = 82.0
+margin_bottom = 56.0
+text = "New Game"
+
+[node name="LoadButton" type="Button" parent="VBoxContainer"]
+margin_top = 60.0
+margin_right = 82.0
+margin_bottom = 82.0
+text = "Continue"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+margin_top = 86.0
+margin_right = 82.0
+margin_bottom = 108.0
+text = "Quit"
+[connection signal="pressed" from="VBoxContainer/StartButton" to="." method="_on_StartButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
