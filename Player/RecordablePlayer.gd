@@ -24,18 +24,22 @@ func _physics_process(delta):
 	process_input(delta)  # Actually move the player, update animations, etc.
 	
 	if is_action_just_pressed("start_recording"):
-		if not is_moving() and not is_recording:
+		if not is_moving() and not is_recording and not len(recorded_data):
 			print("Begin recording")
 			start_recording()
 		elif is_moving():
 			print("Cannot begin recording while moving: ", motion)
 		elif is_recording:
 			print("Cannot begin a recording while one is active")
+		elif len(recorded_data):
+			print("Cannot begin recording while we have some still")
 	
 	if is_recording:
 		record()
 
 	if is_action_just_pressed("start_loop"):
+		stop_recording()
+		Events.emit_signal("player_recording_disabled")
 		emit_signal("begin_loop")
 
 	frame_count += 1
@@ -74,6 +78,7 @@ func take_recorded_data():
 	:returns: The recorded data
 	"""
 	var ret = recorded_data
+	Events.emit_signal("player_recording_enabled")
 	clear_recording()
 	return ret
 
@@ -134,6 +139,11 @@ func record():
 	"""
 	Used to record inputs while recording is running
 	"""
+	Events.emit_signal(
+		"set_record_percent",
+		(maxRecordTimer.time_left / maxRecordTimer.wait_time)
+	)
+
 	var current_record = {
 		"frame": frame_count,              # Current physics frame for playback
 		"inputs": [],                      # The current inputs
@@ -178,4 +188,6 @@ func record():
 
 func _on_MaxRecordTimer_timeout():
 	print("Max recording time reached!")
+	stop_recording()
+	Events.emit_signal("player_recording_disabled")
 	emit_signal("begin_loop")

@@ -39,6 +39,7 @@ onready var muzzle = $PlayerSprite/Sprite/PlayerGun/Sprite/Muzzle
 onready var gun = $PlayerSprite/Sprite/PlayerGun
 onready var fireBulletTimer = $FireBulletTimer
 onready var hurtbox = $Hurtbox
+onready var collider = $Collider
 
 
 func _ready():
@@ -205,11 +206,9 @@ func update_animations(input_vector):
 	
 	:param input_vector: The current input_vector returned from get_input_vector
 	"""
-	var facing = 1
+	var facing = 0
 	if follow_mouse:
 		facing = sign(get_local_mouse_position().x)
-	else:
-		facing = input_vector.x
 
 	if facing != 0:
 		sprite.scale.x = facing
@@ -271,6 +270,7 @@ func start_rewind():
 	rewind_idx = len(rewind_data)
 	state = PlayerState.REWIND
 	gun.follow_mouse = false
+	collider.disabled = true
 
 
 func rewind():
@@ -285,6 +285,7 @@ func rewind():
 		state = PlayerState.MOVE
 		animationPlayer.playback_speed = 1
 		gun.follow_mouse = true
+		collider.disabled = false
 		return
 
 	var frame = rewind_data[rewind_idx]

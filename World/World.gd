@@ -126,6 +126,8 @@ func _on_RecordablePlayer_died():
 	player = null
 	
 	if other_self != null:
+		print("Loop broken!")
+		Events.emit_signal("player_recording_enabled")
 		reconstruct_player(other_self.global_position)
 		other_self.clear_time_marker()
 		other_self.queue_free()
@@ -143,6 +145,7 @@ func _on_RecordablePlayer_begin_loop():
 		player.start_rewind()
 		
 		Events.emit_signal("player_recording_complete")
+		Events.emit_signal("player_recording_enabled")
 
 
 func _on_RecordablePlayer_exit_level(level_portal):
