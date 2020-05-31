@@ -18,6 +18,7 @@ onready var maxRecordTimer = $MaxRecordTimer
 
 func _ready():
 	record_point = global_position
+	Events.connect("item_destroyed", self, "_on_Item_destroyed")
 
 
 func _physics_process(delta):
@@ -155,7 +156,8 @@ func record():
 		"position": global_position,
 		"facing": sprite.scale.x,
 		"gun_rotation": gun.rotation,
-		"animation": get_current_animation()
+		"animation": get_current_animation(),
+		"items_destroyed": []
 	}
 
 	# We only parse out JUST_PRESSED and JUST_RELEASED actions (all we need)
@@ -184,6 +186,24 @@ func record():
 		
 	# Save to our global rewind_data struct no matter what
 	rewind_data.push_back(rewind_record)
+
+
+func _on_Item_destroyed(scene_path, pos):
+	if is_recording:
+		if len(rewind_data) == 0:
+			var rewind_record = {
+				"position": global_position,
+				"facing": sprite.scale.x,
+				"gun_rotation": gun.rotation,
+				"animation": get_current_animation(),
+				"items_destroyed": []
+			}
+			rewind_data.push_back(rewind_record)
+
+		rewind_data[-1].items_destroyed.push_back({
+			scene_path = scene_path,
+			position = pos
+		})
 
 
 func _on_MaxRecordTimer_timeout():

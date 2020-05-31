@@ -277,8 +277,19 @@ func rewind():
 	"""
 	Visually rewind a player
 	"""
+	var items_destroyed = []
+	var check_idx = rewind_idx - 1
 	rewind_idx -= 2
 
+	if check_idx >= 0:
+		items_destroyed += rewind_data[check_idx].items_destroyed
+	if rewind_idx >= 0:
+		items_destroyed += rewind_data[rewind_idx].items_destroyed
+	
+	if len(items_destroyed) > 0:
+		for item in items_destroyed:
+			Utils.instance_scene_on_main(load(item.scene_path), item.position)
+	
 	if rewind_idx < 0:
 		rewind_idx = 0
 		emit_signal("rewind_complete")

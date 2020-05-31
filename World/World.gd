@@ -81,12 +81,16 @@ func reload_level():
 		other_self.queue_free()
 		other_self = null
 		currentLevel.activate_portal()
+
+	currentLevel.reset_level()
 	
 	if player == null:
 		reconstruct_player(currentLevel.get_spawn_point())
 	
 	# Respawn the player (recording will be cleared)
 	player.respawn()
+	
+	Events.emit_signal("level_reloaded")
 
 
 func change_levels(level_portal):

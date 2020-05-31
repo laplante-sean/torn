@@ -5,5 +5,7 @@ signal player_recording_complete
 signal player_rewind_complete
 signal player_recording_disabled
 signal player_recording_enabled
+signal level_reloaded
+signal item_destroyed(scene_path, position)
 signal set_record_percent(value)
 signal add_camera_shake(amount, duration)

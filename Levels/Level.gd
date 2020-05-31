@@ -14,3 +14,11 @@ func activate_portal():
 
 func deactivate_portal():
 	levelPortal.active = false
+
+
+func reset_level():
+	"""
+	This can be overriden by instances of a level
+	to execute any time a level is reloaded.
+	"""
+	print("Reset level not implemented for this level")

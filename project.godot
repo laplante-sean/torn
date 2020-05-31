@@ -157,6 +157,7 @@ pause={
 2d_physics/layer_3="PlayerHurtbox"
 2d_physics/layer_4="ClonePlayer"
 2d_physics/layer_5="ClonePlayerHurtbox"
+2d_physics/layer_6="Destructible"
 
 [rendering]
 
