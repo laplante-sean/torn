@@ -31,6 +31,9 @@ func _ready():
 		# If not we default to Level_00
 		currentLevel = Utils.instance_scene_on_main(Level_00)
 	
+	if MainInstances.is_new_game:
+		SaveAndLoad.save_data_to_file(SaveAndLoad.default_save_data)
+	
 	# So the background defaults to black on every frame
 	VisualServer.set_default_clear_color(Color.black)
 	player.spawn(currentLevel.get_spawn_point())
@@ -74,6 +77,7 @@ func reset_zoom():
 
 func reload_level():
 	if other_self:
+		other_self.clear_time_marker()
 		other_self.queue_free()
 		other_self = null
 		currentLevel.activate_portal()

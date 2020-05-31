@@ -3,3 +3,4 @@ extends Node
 signal player_started_recording
 signal player_recording_complete
 signal player_rewind_complete
+signal add_camera_shake(amount, duration)

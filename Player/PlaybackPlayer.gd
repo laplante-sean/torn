@@ -107,6 +107,7 @@ func playback():
 		clear_inputs()  # Don't want to leave anything pressed
 		start_playback()
 		respawn()
+		gun.follow_mouse = false
 		return
 
 	if frame_count != playback_data[record_idx].frame:
@@ -121,15 +122,12 @@ func playback():
 		var distance = global_position.distance_to(data.position)  # Get how far we would be jumped
 		if not test_move(transform, direction * distance):
 			# No collision would occur so let's fix the position
-			print("Fix position")
 			global_position = data.position
 		else:
 			# At this point we kindof just have to throw the data.position out
-			print("Cannot fix position")
 			out_of_sync = true
 	elif global_position == data.position and out_of_sync:
 		# We've come back into sync (maybe they were running into a wall or whatever)
-		print("Back in sync")
 		out_of_sync = false
 
 	sprite.scale.x = data.facing

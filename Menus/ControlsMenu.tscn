@@ -1,0 +1,175 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Menus/ControlsMenu.gd" type="Script" id=1]
+[ext_resource path="res://Menus/MenuTheme.tres" type="Theme" id=2]
+
+[node name="ControlsMenu" type="ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 2 )
+color = Color( 0, 0, 0, 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 61.0
+margin_bottom = 18.0
+text = "Controls"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer"]
+margin_left = 21.0
+margin_top = 27.0
+margin_right = 299.0
+margin_bottom = 153.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
+margin_right = 25.0
+margin_bottom = 126.0
+
+[node name="MoveLeftControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+margin_right = 25.0
+margin_bottom = 22.0
+text = "A"
+
+[node name="MoveRightControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+margin_top = 26.0
+margin_right = 25.0
+margin_bottom = 48.0
+text = "D"
+
+[node name="JumpControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+margin_top = 52.0
+margin_right = 25.0
+margin_bottom = 74.0
+text = "W"
+
+[node name="BegineRecordControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+margin_top = 78.0
+margin_right = 25.0
+margin_bottom = 100.0
+text = "E"
+
+[node name="BeginLoopControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer"]
+margin_top = 104.0
+margin_right = 25.0
+margin_bottom = 126.0
+text = "F"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
+margin_left = 29.0
+margin_right = 140.0
+margin_bottom = 126.0
+
+[node name="MoveLeftLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+margin_right = 111.0
+margin_bottom = 22.0
+text = "Move Left"
+
+[node name="MoveRightLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 26.0
+margin_right = 111.0
+margin_bottom = 48.0
+text = "Move Right"
+
+[node name="JumpLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 52.0
+margin_right = 111.0
+margin_bottom = 74.0
+text = "Jump"
+
+[node name="BeginRecordLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 78.0
+margin_right = 111.0
+margin_bottom = 100.0
+text = "Begin Recording"
+
+[node name="BeginLoopLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer2"]
+margin_top = 104.0
+margin_right = 111.0
+margin_bottom = 126.0
+text = "Begin Loop"
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
+margin_left = 144.0
+margin_right = 178.0
+margin_bottom = 126.0
+
+[node name="ResetCameraControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer3"]
+margin_right = 34.0
+margin_bottom = 22.0
+text = "Q"
+
+[node name="ResetLevelControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 26.0
+margin_right = 34.0
+margin_bottom = 48.0
+text = "R"
+
+[node name="PauseGameControl" type="Button" parent="CenterContainer/HBoxContainer/VBoxContainer3"]
+margin_top = 52.0
+margin_right = 34.0
+margin_bottom = 74.0
+text = "ESC"
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
+margin_left = 182.0
+margin_right = 278.0
+margin_bottom = 126.0
+
+[node name="ResetCameraLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer4"]
+margin_right = 96.0
+margin_bottom = 22.0
+text = "Reset Camera"
+
+[node name="ResetLevelLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer4"]
+margin_top = 26.0
+margin_right = 96.0
+margin_bottom = 48.0
+text = "Reset Level"
+
+[node name="PauseGameLabel" type="Label" parent="CenterContainer/HBoxContainer/VBoxContainer4"]
+margin_top = 52.0
+margin_right = 96.0
+margin_bottom = 74.0
+text = "Pause Game"
+
+[node name="OtherLabel" type="Label" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -138.0
+margin_top = -56.0
+text = "Aim: mouse
+Fire: left mouse
+Zoom: Mouse wheel"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackButton" type="Button" parent="."]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = -24.0
+margin_right = 44.0
+margin_bottom = -2.0
+text = "Back"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="BackButton" to="." method="_on_BackButton_pressed"]

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Menus/StartMenu.gd" type="Script" id=1]
 [ext_resource path="res://Menus/MenuTheme.tres" type="Theme" id=2]
+[ext_resource path="res://Menus/ControlsMenu.tscn" type="PackedScene" id=3]
 
 [node name="StartMenu" type="Control"]
 anchor_right = 1.0
@@ -47,11 +48,21 @@ margin_right = 82.0
 margin_bottom = 82.0
 text = "Continue"
 
-[node name="QuitButton" type="Button" parent="VBoxContainer"]
+[node name="ControlsButton" type="Button" parent="VBoxContainer"]
 margin_top = 86.0
 margin_right = 82.0
 margin_bottom = 108.0
+text = "Controls"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+margin_top = 112.0
+margin_right = 82.0
+margin_bottom = 134.0
 text = "Quit"
+
+[node name="ControlsMenu" parent="." instance=ExtResource( 3 )]
+visible = false
 [connection signal="pressed" from="VBoxContainer/StartButton" to="." method="_on_StartButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/ControlsButton" to="." method="_on_ControlsButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]

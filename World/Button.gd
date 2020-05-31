@@ -30,10 +30,8 @@ func _on_Area2D_body_entered(body):
 	pressers += 1
 
 	if self.state == PRESSED:
-		print("Already pressed")
 		return  #Already pressed
 
-	print("Button Pressed!")
 	self.state = PRESSED
 	emit_signal("button_pressed")
 
@@ -42,9 +40,6 @@ func _on_Area2D_body_exited(body):
 	pressers -= 1
 
 	if pressers <= 0:
-		print("Button Released!")
 		pressers = 0
 		self.state = NOT_PRESSED
 		emit_signal("button_released")
-	else:
-		print("Button still being held!")

@@ -23,9 +23,9 @@ __meta__ = {
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 margin_left = 112.0
-margin_top = 49.0
+margin_top = 36.0
 margin_right = 208.0
-margin_bottom = 131.0
+margin_bottom = 144.0
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 96.0
@@ -43,10 +43,17 @@ margin_right = 96.0
 margin_bottom = 56.0
 text = "Resume"
 
-[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="ControlsButton" type="Button" parent="CenterContainer/VBoxContainer"]
 margin_top = 60.0
 margin_right = 96.0
 margin_bottom = 82.0
+text = "Controls"
+
+[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 86.0
+margin_right = 96.0
+margin_bottom = 108.0
 text = "Quit"
 [connection signal="pressed" from="CenterContainer/VBoxContainer/ResumeButton" to="." method="_on_ResumeButton_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/ControlsButton" to="." method="_on_ControlsButton_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
