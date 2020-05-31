@@ -16,7 +16,7 @@ func _ready():
 	Events.connect("set_record_percent", self, "set_record_percent")
 	Events.connect("player_recording_disabled", self, "set_recording_disabled")
 	Events.connect("player_recording_enabled", self, "set_recording_enabled")
-	Events.connect("level_reloaded", self, "set_recording_enabled")
+	Events.connect("level_reloaded", self, "level_reloaded")
 
 
 func set_play_state():
@@ -48,7 +48,11 @@ func set_recording_disabled():
 	recordBarDisabled.visible = true
 
 
-func set_recording_enabled():
+func level_reloaded():
 	set_play_state()
+	set_recording_enabled()
+
+
+func set_recording_enabled():
 	recordBarFull.set_scale(Vector2.ONE)
 	recordBarDisabled.visible = false
