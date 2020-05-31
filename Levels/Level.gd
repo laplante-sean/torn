@@ -3,6 +3,12 @@ extends Node2D
 onready var spawnPoint = $SpawnPoint
 onready var levelPortal = $LevelPortal
 
+export(bool) var finalLevel = false
+
+
+func is_final_level():
+	return finalLevel
+
 
 func get_spawn_point():
 	return spawnPoint.global_position
@@ -21,4 +27,4 @@ func reset_level():
 	This can be overriden by instances of a level
 	to execute any time a level is reloaded.
 	"""
-	print("Reset level not implemented for this level")
+	pass

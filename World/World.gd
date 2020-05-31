@@ -94,6 +94,10 @@ func reload_level():
 
 
 func change_levels(level_portal):
+	if currentLevel.is_final_level():
+		get_tree().change_scene("res://Menus/TheEnd.tscn")
+		return
+
 	currentLevel.queue_free()
 	currentLevelPath = level_portal.next_level_path
 	currentLevel = Utils.instance_scene_on_main(load(level_portal.next_level_path))

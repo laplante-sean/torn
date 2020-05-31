@@ -31,7 +31,6 @@ func _on_Button_released():
 
 
 func reset_level():
-	print("RESET")
 	door2.close()
 	num_destroyed = 0
 	
