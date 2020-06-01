@@ -24,7 +24,7 @@ __meta__ = {
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 margin_right = 82.0
-margin_bottom = 22.0
+margin_bottom = 14.0
 text = "Torn"
 align = 1
 __meta__ = {
@@ -32,32 +32,32 @@ __meta__ = {
 }
 
 [node name="Gap" type="HSeparator" parent="VBoxContainer"]
-margin_top = 26.0
+margin_top = 18.0
 margin_right = 82.0
-margin_bottom = 30.0
+margin_bottom = 22.0
 
 [node name="StartButton" type="Button" parent="VBoxContainer"]
-margin_top = 34.0
+margin_top = 26.0
 margin_right = 82.0
-margin_bottom = 56.0
+margin_bottom = 48.0
 text = "New Game"
 
 [node name="LoadButton" type="Button" parent="VBoxContainer"]
-margin_top = 60.0
+margin_top = 52.0
 margin_right = 82.0
-margin_bottom = 82.0
+margin_bottom = 74.0
 text = "Continue"
 
 [node name="ControlsButton" type="Button" parent="VBoxContainer"]
-margin_top = 86.0
+margin_top = 78.0
 margin_right = 82.0
-margin_bottom = 108.0
+margin_bottom = 100.0
 text = "Controls"
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
-margin_top = 112.0
+margin_top = 104.0
 margin_right = 82.0
-margin_bottom = 134.0
+margin_bottom = 126.0
 text = "Quit"
 
 [node name="ControlsMenu" parent="." instance=ExtResource( 3 )]
