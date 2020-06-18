@@ -8,22 +8,4 @@ See the releases for an executable download. Also available at [itch.io](https:/
 
 # Future
 
-​Things I'll maybe do someday if this proof-of-concept turns out to be fun
-
-* ​More platforming
-* Enemies (more uses for the gun)
-* Blocks - So that you don't always need a person to stand on a button
-* More ways to open doors
-    * Completing more complex actions like shooting a bunch of targets
-    * Solving a puzzle
-    * etc.
-* More puzzles/levels (obviously)
-    * Specifically, I wanted one where you'd have to make the "loop" version of you shoot the "real" version of you. In that case you'd take control of the "loop" version.
-* Level editor - This game seems like it could benefit from a level editor
-* Bouncing tiles - Tiles that bounce bullets - Used to make more complicated puzzles when direct line of sight to "loop" you is not available.
-* More than one loop? How many yous is to many yous?
-* More time mechanics
-    * Freezes things in place
-    * Slowing things down
-    * etc...
-* A story?
+See [wiki](https://github.com/vix597/torn/wiki)
